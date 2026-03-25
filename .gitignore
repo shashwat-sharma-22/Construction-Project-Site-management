@@ -1,0 +1,50 @@
+/.vs/
+/bin/
+/obj/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+*.vcxproj.user
+.nuget/
+project.lock.json
+*.nupkg
+*.snk
+.vsconfig
+*.db
+*.log
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userprefs
+# Rider
+.idea/
+# DotCover
+*.dotCover
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+# Entity Framework
+*.dbmdl
+# Local publish
+.publishsettings
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+
+# Docker
+docker-compose.*.yml
+
+# Node
+node_modules/
+
+# JetBrains
+*.iml
+
+# Mac
+.DS_Store
