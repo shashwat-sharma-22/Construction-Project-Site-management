@@ -1,0 +1,164 @@
+@model ConstructionProject.DTOs.UserResponseDto
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>👤 My Profile</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <form method="post" action="@Url.Action("Logout", "Account")" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">User Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Full Name:</label>
+                            <p>@Model.Name</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email:</label>
+                            <p>@Model.Email</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Role:</label>
+                            <p>
+                                <span class="badge bg-primary">@Model.Role</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Account Created:</label>
+                            <p>@Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Role Permissions</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Role.ToString() == "0" || Model.Role.ToString() == "Admin")
+                    {
+                        <div class="alert alert-info">
+                            <strong>✓ Admin Access</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Manage all projects</li>
+                                <li>Manage all contractors</li>
+                                <li>View all progress reports</li>
+                                <li>Manage safety inspections</li>
+                                <li>Manage inventory</li>
+                                <li>Manage users and roles</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (Model.Role.ToString() == "1" || Model.Role.ToString() == "ProjectManager")
+                    {
+                        <div class="alert alert-info">
+                            <strong>✓ Project Manager Access</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>✓ Create and manage projects</li>
+                                <li>✓ View project details</li>
+                                <li>✓ Assign contractors to projects</li>
+                                <li>✓ View progress reports</li>
+                                <li>✓ Manage project inventory</li>
+                                <li>✗ Cannot manage users</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (Model.Role.ToString() == "2" || Model.Role.ToString() == "SiteEngineer")
+                    {
+                        <div class="alert alert-info">
+                            <strong>✓ Site Engineer Access</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>✓ View all projects</li>
+                                <li>✓ Log progress updates</li>
+                                <li>✓ Report safety issues</li>
+                                <li>✓ Manage field inventory</li>
+                                <li>✗ Cannot create projects</li>
+                                <li>✗ Cannot manage contractors</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (Model.Role.ToString() == "4" || Model.Role.ToString() == "SafetyOfficer")
+                    {
+                        <div class="alert alert-info">
+                            <strong>✓ Safety Officer Access</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>✓ Create safety inspections</li>
+                                <li>✓ View all inspections</li>
+                                <li>✓ Report safety issues</li>
+                                <li>✓ View compliance reports</li>
+                                <li>✗ Cannot manage projects</li>
+                                <li>✗ Cannot modify inventory</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (Model.Role.ToString() == "3" || Model.Role.ToString() == "Contractor")
+                    {
+                        <div class="alert alert-info">
+                            <strong>✓ Contractor Access</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>✓ View assigned projects</li>
+                                <li>✓ Log workforce information</li>
+                                <li>✓ View progress on assigned projects</li>
+                                <li>✗ Cannot create projects</li>
+                                <li>✗ Cannot modify other data</li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Account Status</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <h5>Status</h5>
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success" style="font-size: 16px; padding: 8px 12px;">
+                                ✓ Active
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger" style="font-size: 16px; padding: 8px 12px;">
+                                ✗ Inactive
+                            </span>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary w-100">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

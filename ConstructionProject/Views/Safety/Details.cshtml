@@ -1,0 +1,65 @@
+@model ConstructionProject.Models.SafetyInspection
+
+@{
+    ViewData["Title"] = "Safety Inspection Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">⚠️ Safety Inspection Report - Project @Model.ProjectId</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Inspection ID:</label>
+                            <p>@Model.InspectionId</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Project ID:</label>
+                            <p>@Model.ProjectId</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Inspection Date:</label>
+                            <p>@Model.InspectionDate.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Compliance Status:</label>
+                            <p>
+                                @if (Model.ComplianceStatus.ToString() == "COMPLIANT")
+                                {
+                                    <span class="badge bg-success">✓ Compliant</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">✗ Non-Compliant</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.IssuesFound))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Issues Found:</label>
+                                <p>@Model.IssuesFound</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a href="@Url.Action("Edit", "Safety", new { id = Model.InspectionId })" class="btn btn-warning me-2">Edit</a>
+                        <a href="@Url.Action("Index", "Safety")" class="btn btn-secondary">Back</a>
+                        <a href="@Url.Action("Delete", "Safety", new { id = Model.InspectionId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

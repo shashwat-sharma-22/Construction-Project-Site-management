@@ -1,0 +1,45 @@
+@model ConstructionProject.Models.Contractor
+
+@{
+    ViewData["Title"] = "Add Contractor";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>➕ Add New Contractor</h1>
+            <hr />
+
+            <form asp-action="Create">
+                <div class="form-group mb-3">
+                    <label asp-for="ContractorName" class="form-label">Contractor Name</label>
+                    <input asp-for="ContractorName" class="form-control" placeholder="Enter contractor name" />
+                    <span asp-validation-for="ContractorName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Specialization" class="form-label">Specialization</label>
+                    <input asp-for="Specialization" class="form-control" placeholder="e.g., Plumbing, Electrical, Carpentry" />
+                    <span asp-validation-for="Specialization" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ContactInfo" class="form-label">Contact Information</label>
+                    <input asp-for="ContactInfo" class="form-control" placeholder="Phone or Email" />
+                    <span asp-validation-for="ContactInfo" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary me-2">Add Contractor</button>
+                    <a href="@Url.Action("Index", "Contractor")" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -16,6 +16,11 @@ namespace ConstructionProject.Services
             _db = db;
         }
 
+        public async Task<IEnumerable<Contractor>> GetAllContractorsAsync()
+        {
+            return await _db.Contractors.Include(c => c.Workforces).ToListAsync();
+        }
+
         public async Task<Contractor> AddContractorAsync(Contractor contractor)
         {
             _db.Contractors.Add(contractor);
@@ -40,6 +45,30 @@ namespace ConstructionProject.Services
             return await _db.Contractors
                 .Include(c => c.Workforces)
                 .FirstOrDefaultAsync(c => c.ContractorId == id);
+        }
+
+        public async Task<bool> UpdateContractorAsync(int id, Contractor updated)
+        {
+            var existing = await _db.Contractors.FindAsync(id);
+            if (existing == null) return false;
+
+            existing.ContractorName = updated.ContractorName;
+            existing.Specialization = updated.Specialization;
+            existing.ContactInfo = updated.ContactInfo;
+
+            _db.Contractors.Update(existing);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteContractorAsync(int id)
+        {
+            var contractor = await _db.Contractors.FindAsync(id);
+            if (contractor == null) return false;
+
+            _db.Contractors.Remove(contractor);
+            await _db.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<Contractor>> GetAllAsync()

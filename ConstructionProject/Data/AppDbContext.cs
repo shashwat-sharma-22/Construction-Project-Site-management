@@ -16,6 +16,21 @@ namespace ConstructionProject.Data
         public DbSet<Material> Materials { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<SafetyInspection> SafetyInspections { get; set; }
+        public DbSet<AppUser> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AppUser>().HasData(new AppUser
+            {
+                UserId = 1,
+                Name = "Super Admin",
+                Email = "admin@construction.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+                Role = UserRole.Admin,
+                IsActive = true,
+                CreatedAt = new DateTime(2026, 3, 26, 11, 15, 52, 337, DateTimeKind.Utc)
+            });
+        }
 
     }
 }

@@ -1,0 +1,63 @@
+@model IEnumerable<ConstructionProject.Models.Progress>
+
+@{
+    ViewData["Title"] = "Project Progress";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>📊 Project Progress</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Create", "Progress")" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Log Progress
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Report Date</th>
+                        <th>Completed Tasks</th>
+                        <th>Remarks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var progress in Model)
+                    {
+                        <tr>
+                            <td>@progress.ProjectId</td>
+                            <td>@progress.ReportDate.ToString("MMM dd, yyyy")</td>
+                            <td><span class="badge bg-success">@progress.CompletedTasks</span></td>
+                            <td>@progress.Remarks</td>
+                            <td>
+                                <a href="@Url.Action("Details", "Progress", new { id = progress.ProgressId })" class="btn btn-info btn-sm">View</a>
+                                <a href="@Url.Action("Edit", "Progress", new { id = progress.ProgressId })" class="btn btn-warning btn-sm">Edit</a>
+                                <form asp-action="Delete" asp-controller="Progress" asp-route-id="@progress.ProgressId" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?)">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <h5>No progress reports found</h5>
+            <p>Create your first progress report.</p>
+            <a href="@Url.Action("Create", "Progress")" class="btn btn-primary">Log Progress</a>
+        </div>
+    }
+</div>

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConstructionProject.Data;
 using ConstructionProject.Models;
@@ -12,6 +13,11 @@ namespace ConstructionProject.Services
         public ProjectService(AppDbContext db)
         {
             _db = db;
+        }
+
+        public async Task<IEnumerable<Project>> GetAllProjectsAsync()
+        {
+            return await _db.Projects.ToListAsync();
         }
 
         public async Task<Project> CreateProjectAsync(Project project)
@@ -38,6 +44,16 @@ namespace ConstructionProject.Services
             existing.budget = updated.budget;
 
             _db.Projects.Update(existing);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteProjectAsync(int id)
+        {
+            var project = await _db.Projects.FindAsync(id);
+            if (project == null) return false;
+
+            _db.Projects.Remove(project);
             await _db.SaveChangesAsync();
             return true;
         }

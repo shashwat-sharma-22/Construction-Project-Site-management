@@ -1,8 +1,234 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>🏗️ Construction Site Management Dashboard</h1>
+            <p class="text-muted">Welcome, <strong>@ViewBag.UserName</strong> | Role: <span class="badge bg-primary">@ViewBag.UserRole</span></p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Profile", "Account")" class="btn btn-outline-primary me-2">👤 My Profile</a>
+            <form method="post" action="@Url.Action("Logout", "Account")" style="display:inline;">
+                <button type="submit" class="btn btn-outline-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN & PROJECT MANAGER - Can manage projects -->
+    @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "ProjectManager")
+    {
+        <div class="alert alert-info mb-4">
+            <strong>📋 Project Management Section</strong>
+            <p class="mb-0">Create, edit, and manage construction projects</p>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 Projects</h5>
+                        <p class="card-text">Manage construction projects</p>
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-light btn-sm">View All</a>
+                        @if (ViewBag.UserRole == "ProjectManager" || ViewBag.UserRole == "Admin")
+                        {
+                            <a href="@Url.Action("Create", "Project")" class="btn btn-light btn-sm">+ New</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ADMIN & PROJECT MANAGER - Can manage contractors -->
+    @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "ProjectManager")
+    {
+        <div class="alert alert-warning mb-4">
+            <strong>👷 Contractor Management Section</strong>
+            <p class="mb-0">Manage contractors and workforce assignments</p>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">👷 Contractors</h5>
+                        <p class="card-text">Manage contractors & workforce</p>
+                        <a href="@Url.Action("Index", "Contractor")" class="btn btn-light btn-sm">View All</a>
+                        @if (ViewBag.UserRole == "ProjectManager" || ViewBag.UserRole == "Admin")
+                        {
+                            <a href="@Url.Action("Create", "Contractor")" class="btn btn-light btn-sm">+ New</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ALL ROLES EXCEPT CONTRACTOR - Can view progress -->
+    @if (ViewBag.UserRole != "Contractor")
+    {
+        <div class="alert alert-success mb-4">
+            <strong>📊 Progress Tracking Section</strong>
+            <p class="mb-0">Track project progress and updates</p>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Progress</h5>
+                        <p class="card-text">Track project progress</p>
+                        <a href="@Url.Action("Index", "Progress")" class="btn btn-light btn-sm">View All</a>
+                        @if (ViewBag.UserRole == "SiteEngineer" || ViewBag.UserRole == "Admin")
+                        {
+                            <a href="@Url.Action("Create", "Progress")" class="btn btn-light btn-sm">+ Log</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ADMIN, PROJECT MANAGER, SITE ENGINEER - Can manage inventory -->
+    @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "ProjectManager" || ViewBag.UserRole == "SiteEngineer")
+    {
+        <div class="alert alert-secondary mb-4">
+            <strong>🔧 Inventory Management Section</strong>
+            <p class="mb-0">Manage equipment and materials</p>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">🔧 Inventory</h5>
+                        <p class="card-text">Equipment & materials</p>
+                        <a href="@Url.Action("Index", "Inventory")" class="btn btn-light btn-sm">View All</a>
+                        <a href="@Url.Action("Create", "Inventory")" class="btn btn-light btn-sm">+ Add</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ADMIN, SITE ENGINEER, SAFETY OFFICER - Can manage safety -->
+    @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "SiteEngineer" || ViewBag.UserRole == "SafetyOfficer")
+    {
+        <div class="alert alert-danger mb-4">
+            <strong>⚠️ Safety Management Section</strong>
+            <p class="mb-0">Safety inspections and compliance reports</p>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">⚠️ Safety</h5>
+                        <p class="card-text">Safety inspections</p>
+                        <a href="@Url.Action("Index", "Safety")" class="btn btn-light btn-sm">View All</a>
+                        @if (ViewBag.UserRole == "SafetyOfficer" || ViewBag.UserRole == "Admin")
+                        {
+                            <a href="@Url.Action("Create", "Safety")" class="btn btn-light btn-sm">+ New</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ACCESS SUMMARY BASED ON ROLE -->
+    <div class="card mt-5">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Your Access Level: @ViewBag.UserRole</h5>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.UserRole == "Admin")
+            {
+                <div class="alert alert-info">
+                    <strong>✓ Full System Access</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>✓ Create and manage all projects</li>
+                        <li>✓ Manage all contractors</li>
+                        <li>✓ View all progress reports</li>
+                        <li>✓ Manage inventory</li>
+                        <li>✓ Manage safety inspections</li>
+                        <li>✓ User and role management</li>
+                    </ul>
+                </div>
+            }
+            else if (ViewBag.UserRole == "ProjectManager")
+            {
+                <div class="alert alert-info">
+                    <strong>✓ Project Manager Access</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>✓ Create and manage projects</li>
+                        <li>✓ Manage contractors assignment</li>
+                        <li>✓ View progress reports</li>
+                        <li>✓ Manage project inventory</li>
+                        <li>✗ Cannot manage users</li>
+                    </ul>
+                </div>
+            }
+            else if (ViewBag.UserRole == "SiteEngineer")
+            {
+                <div class="alert alert-info">
+                    <strong>✓ Site Engineer Access</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>✓ View all projects</li>
+                        <li>✓ Log progress updates</li>
+                        <li>✓ Report safety issues</li>
+                        <li>✓ Manage field inventory</li>
+                        <li>✗ Cannot create projects</li>
+                    </ul>
+                </div>
+            }
+            else if (ViewBag.UserRole == "SafetyOfficer")
+            {
+                <div class="alert alert-info">
+                    <strong>✓ Safety Officer Access</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>✓ Create safety inspections</li>
+                        <li>✓ View all inspections</li>
+                        <li>✓ Report safety issues</li>
+                        <li>✓ View compliance reports</li>
+                        <li>✗ Cannot manage projects</li>
+                    </ul>
+                </div>
+            }
+            else if (ViewBag.UserRole == "Contractor")
+            {
+                <div class="alert alert-info">
+                    <strong>✓ Contractor Access</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>✓ View assigned projects</li>
+                        <li>✓ View progress on assigned projects</li>
+                        <li>✓ Access contractor specific data</li>
+                        <li>✗ Cannot create projects</li>
+                        <li>✗ Cannot modify other data</li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
 </div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .card-body {
+        padding: 2rem 1rem;
+    }
+
+    .card-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+</style>

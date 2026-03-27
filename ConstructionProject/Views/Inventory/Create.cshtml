@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Add Inventory Item";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>➕ Add Inventory Item</h1>
+            <hr />
+
+            <form asp-action="Create">
+                <div class="form-group mb-3">
+                    <label for="itemType" class="form-label">Item Type</label>
+                    <select id="itemType" name="itemType" class="form-select" onchange="toggleItemType()">
+                        <option value="">-- Select Type --</option>
+                        <option value="equipment">Equipment</option>
+                        <option value="material">Material</option>
+                    </select>
+                </div>
+
+                <div id="equipmentFields" style="display: none;">
+                    <div class="form-group mb-3">
+                        <label for="equipmentName" class="form-label">Equipment Name</label>
+                        <input type="text" id="equipmentName" class="form-control" placeholder="Enter equipment name" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select id="status" class="form-select">
+                            <option value="AVAILABLE">Available</option>
+                            <option value="IN_USE">In Use</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="materialFields" style="display: none;">
+                    <div class="form-group mb-3">
+                        <label for="materialName" class="form-label">Material Name</label>
+                        <input type="text" id="materialName" class="form-control" placeholder="Enter material name" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" id="quantity" class="form-control" placeholder="0" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="unit" class="form-label">Unit</label>
+                        <input type="text" id="unit" class="form-control" placeholder="e.g., kg, liter, meter" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary me-2">Add Item</button>
+                    <a href="@Url.Action("Index", "Inventory")" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleItemType() {
+    const itemType = document.getElementById('itemType').value;
+    document.getElementById('equipmentFields').style.display = itemType === 'equipment' ? 'block' : 'none';
+    document.getElementById('materialFields').style.display = itemType === 'material' ? 'block' : 'none';
+}
+</script>

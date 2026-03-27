@@ -1,0 +1,51 @@
+@model IEnumerable<ConstructionProject.Models.Contractor>
+
+@{
+    ViewData["Title"] = "Contractors";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>👷 Contractors</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Create", "Contractor")" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Add Contractor
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-3">
+            @foreach (var contractor in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@contractor.ContractorName</h5>
+                            <p class="card-text">
+                                <strong>Specialization:</strong> @contractor.Specialization<br />
+                                <strong>Contact:</strong> @contractor.ContactInfo
+                            </p>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <a href="@Url.Action("Details", "Contractor", new { id = contractor.ContractorId })" class="btn btn-info btn-sm">View</a>
+                            <a href="@Url.Action("Edit", "Contractor", new { id = contractor.ContractorId })" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="@Url.Action("Delete", "Contractor", new { id = contractor.ContractorId })" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <h5>No contractors found</h5>
+            <p>Add your first contractor to get started.</p>
+            <a href="@Url.Action("Create", "Contractor")" class="btn btn-primary">Add Contractor</a>
+        </div>
+    }
+</div>

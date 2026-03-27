@@ -1,0 +1,52 @@
+@model ConstructionProject.Models.Progress
+
+@{
+    ViewData["Title"] = "Progress Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">📊 Progress Report - Project @Model.ProjectId</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Progress ID:</label>
+                            <p>@Model.ProgressId</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Report Date:</label>
+                            <p>@Model.ReportDate.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Completed Tasks:</label>
+                            <p><span class="badge bg-success">@Model.CompletedTasks</span></p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Remarks))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Remarks:</label>
+                                <p>@Model.Remarks</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a href="@Url.Action("Edit", "Progress", new { id = Model.ProgressId })" class="btn btn-warning me-2">Edit</a>
+                        <a href="@Url.Action("Index", "Progress")" class="btn btn-secondary">Back</a>
+                        <a href="@Url.Action("Delete", "Progress", new { id = Model.ProgressId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ConstructionProject.Models
 {
@@ -10,6 +11,7 @@ namespace ConstructionProject.Models
         public string? Name { get; set; }
         public string? Role { get; set; }
 
+        [JsonIgnore]
         public Contractor? Contractor { get; set; }
     }
 }

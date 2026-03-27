@@ -1,0 +1,46 @@
+@model ConstructionProject.Models.Project
+
+@{
+    ViewData["Title"] = "Project Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">📋 @Model.ProjectName</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Project ID:</label>
+                            <p>@Model.ProjectId</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Budget:</label>
+                            <p>$@Model.budget.ToString("N2")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Start Date:</label>
+                            <p>@Model.startDate?.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">End Date:</label>
+                            <p>@Model.endDate?.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="@Url.Action("Edit", "Project", new { id = Model.ProjectId })" class="btn btn-warning me-2">Edit</a>
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-secondary">Back</a>
+                        <a href="@Url.Action("Delete", "Project", new { id = Model.ProjectId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

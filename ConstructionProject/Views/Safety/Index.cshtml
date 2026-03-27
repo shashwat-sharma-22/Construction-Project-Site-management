@@ -1,0 +1,73 @@
+@model IEnumerable<ConstructionProject.Models.SafetyInspection>
+
+@{
+    ViewData["Title"] = "Safety Inspections";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>⚠️ Safety Inspections</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Create", "Safety")" class="btn btn-primary">
+                <i class="bi bi-plus"></i> New Inspection
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Inspection Date</th>
+                        <th>Compliance Status</th>
+                        <th>Issues Found</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inspection in Model)
+                    {
+                        <tr>
+                            <td>@inspection.ProjectId</td>
+                            <td>@inspection.InspectionDate.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (inspection.ComplianceStatus.ToString() == "COMPLIANT")
+                                {
+                                    <span class="badge bg-success">✓ Compliant</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">✗ Non-Compliant</span>
+                                }
+                            </td>
+                            <td>@(string.IsNullOrEmpty(inspection.IssuesFound) ? "None" : inspection.IssuesFound)</td>
+                            <td>
+                                <a href="@Url.Action("Details", "Safety", new { id = inspection.InspectionId })" class="btn btn-info btn-sm">View</a>
+                                <a href="@Url.Action("Edit", "Safety", new { id = inspection.InspectionId })" class="btn btn-warning btn-sm">Edit</a>
+                                @* <a href="@Url.Action("Delete", "Safety", new { id = inspection.InspectionId })" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> *@
+                                <form asp-action="Delete" asp-controller="Safety" asp-route-id="@inspection.InspectionId" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?)">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <h5>No safety inspections found</h5>
+            <p>Create your first safety inspection report.</p>
+            <a href="@Url.Action("Create", "Safety")" class="btn btn-primary">New Inspection</a>
+        </div>
+    }
+</div>
