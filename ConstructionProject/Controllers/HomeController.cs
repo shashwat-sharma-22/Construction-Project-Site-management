@@ -13,6 +13,7 @@ namespace ConstructionProject.Controllers
             _logger = logger;
         }
 
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public IActionResult Index()
         {
             // Check if user has auth token in cookie

@@ -26,7 +26,11 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Login([FromForm] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
+            {
                 return View(loginDto);
+            }
+                
+
 
             var user = await _userService.ValidateLogin(loginDto);
             if (user == null)
@@ -47,7 +51,7 @@ namespace ConstructionProject.Controllers
             });
 
             // Store user info in cookies for easier access
-            Response.Cookies.Append("userEmail", user.Email, new Microsoft.AspNetCore.Http.CookieOptions
+            Response.Cookies.Append("userEmail", user.Email ?? "", new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = false,
                 Secure = true,

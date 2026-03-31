@@ -69,6 +69,7 @@ namespace ConstructionProject.Controllers
             return View(contractor);
         }
 
+
         [HttpPost("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

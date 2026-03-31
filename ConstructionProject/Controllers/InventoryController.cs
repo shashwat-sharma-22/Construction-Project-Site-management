@@ -47,6 +47,11 @@ namespace ConstructionProject.Controllers
             }
             else if (itemType == "material")
             {
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    ModelState.AddModelError("", "Name is required");
+                    return View();
+                }
                 var material = new Material
                 {
                     Name = name
