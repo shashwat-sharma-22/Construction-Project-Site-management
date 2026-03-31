@@ -37,7 +37,6 @@ namespace ConstructionProject.Controllers
 
             var token = _jwtTokenService.GenerateToken(user);
 
-            // Store token in cookie
             Response.Cookies.Append("authToken", token, new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
@@ -46,7 +45,6 @@ namespace ConstructionProject.Controllers
                 Expires = System.DateTimeOffset.UtcNow.AddHours(1)
             });
 
-            // Store user info in cookies for easier access
             Response.Cookies.Append("userEmail", user.Email, new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = false,
@@ -93,7 +91,6 @@ namespace ConstructionProject.Controllers
                 return View(registerDto);
             }
 
-            // Redirect to login after successful registration
             TempData["SuccessMessage"] = "Registration successful! Please login with your credentials.";
             return RedirectToAction("Login");
         }
@@ -116,7 +113,6 @@ namespace ConstructionProject.Controllers
         [HttpPost("Account/Logout")]
         public IActionResult Logout()
         {
-            // Delete all auth cookies
             Response.Cookies.Delete("authToken");
             Response.Cookies.Delete("userEmail");
             Response.Cookies.Delete("userRole");

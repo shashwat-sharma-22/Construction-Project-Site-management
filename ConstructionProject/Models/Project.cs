@@ -7,7 +7,7 @@ namespace ConstructionProject.Models
         [Key]
         public int ProjectId { get; set; }
 
-        //[Required]
+        
         public string? ProjectName { get; set; }
         
         public DateTime? startDate { get; set; }

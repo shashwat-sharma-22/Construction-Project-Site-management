@@ -23,7 +23,7 @@ namespace ConstructionProject.Controllers
             return View(projects);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")] 
         public async Task<IActionResult> Details(int id)
         {
             var project = await _service.GetProjectDetailsAsync(id);

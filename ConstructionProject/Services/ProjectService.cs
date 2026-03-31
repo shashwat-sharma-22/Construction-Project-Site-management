@@ -37,7 +37,6 @@ namespace ConstructionProject.Services
             var existing = await _db.Projects.FindAsync(id);
             if (existing == null) return false;
 
-            // update allowed fields
             existing.ProjectName = updated.ProjectName;
             existing.startDate = updated.startDate;
             existing.endDate = updated.endDate;
