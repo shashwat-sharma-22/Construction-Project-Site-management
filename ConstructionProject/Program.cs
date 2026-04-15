@@ -1,4 +1,6 @@
 using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
+using ConstructionProject.Repositories;
 using ConstructionProject.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
-// Add Authentication
+
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT secret key not configured");
 var key = Encoding.ASCII.GetBytes(secretKey);
@@ -50,7 +52,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Add Authorization Policies
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
@@ -62,25 +64,29 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin", "SafetyOfficer", "SiteEngineer"));
 });
 
-// application services
-builder.Services.AddScoped<ProjectService>();
-builder.Services.AddScoped<ContractorService>();
-builder.Services.AddScoped<ProgressService>();
-builder.Services.AddScoped<InventoryService>();
-builder.Services.AddScoped<SafetyService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IContractorRepository, ContractorRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
+builder.Services.AddScoped<ISafetyRepository, SafetyRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IContractorService, ContractorService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
+builder.Services.AddScoped<ISafetyService, SafetyService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 var app = builder.Build();
 
-// Apply EF Core migrations at startup so the running app's database schema matches the model.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -89,14 +95,12 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

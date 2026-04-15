@@ -89,7 +89,7 @@
     }
 
     <!-- ALL ROLES EXCEPT CONTRACTOR - Can view progress -->
-    @if (ViewBag.UserRole != "Contractor")
+    @if (ViewBag.UserRole == "Contractor")
     {
         <div class="alert alert-success mb-4">
             <strong>📊 Progress Tracking Section</strong>

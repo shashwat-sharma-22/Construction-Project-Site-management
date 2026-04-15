@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConstructionProject.Controllers
@@ -9,9 +9,9 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class SafetyController : Controller
     {
-        private readonly SafetyService _service;
+        private readonly ISafetyService _service;
 
-        public SafetyController(SafetyService service)
+        public SafetyController(ISafetyService service)
         {
             _service = service;
         }

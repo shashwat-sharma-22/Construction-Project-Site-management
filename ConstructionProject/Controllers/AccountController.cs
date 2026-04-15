@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using ConstructionProject.DTOs;
-using ConstructionProject.Services;
+using ConstructionProject.Interfaces;
 using System.Threading.Tasks;
 
 namespace ConstructionProject.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserService _userService;
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IUserService _userService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public AccountController(UserService userService, JwtTokenService jwtTokenService)
+        public AccountController(IUserService userService, IJwtTokenService jwtTokenService)
         {
             _userService = userService;
             _jwtTokenService = jwtTokenService;

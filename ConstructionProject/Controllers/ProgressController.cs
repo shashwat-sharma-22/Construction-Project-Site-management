@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConstructionProject.Controllers
@@ -9,9 +9,9 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class ProgressController : Controller
     {
-        private readonly ProgressService _service;
+        private readonly IProgressService _service;
 
-        public ProgressController(ProgressService service)
+        public ProgressController(IProgressService service)
         {
             _service = service;
         }

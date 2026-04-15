@@ -1,79 +1,73 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class ContractorService
+    public class ContractorService : IContractorService
     {
-        private readonly AppDbContext _db;
+        private readonly IContractorRepository _contractorRepository;
 
-        public ContractorService(AppDbContext db)
+        public ContractorService(IContractorRepository contractorRepository)
         {
-            _db = db;
+            _contractorRepository = contractorRepository;
         }
 
         public async Task<IEnumerable<Contractor>> GetAllContractorsAsync()
         {
-            return await _db.Contractors.Include(c => c.Workforces).ToListAsync();
+            return await _contractorRepository.GetAllWithWorkforcesAsync();
         }
 
         public async Task<Contractor> AddContractorAsync(Contractor contractor)
         {
-            _db.Contractors.Add(contractor);
-            await _db.SaveChangesAsync();
+            await _contractorRepository.AddAsync(contractor);
+            await _contractorRepository.SaveChangesAsync();
             return contractor;
         }
 
         public async Task<bool> AssignContractorAsync(int contractorId, Workforce worker)
         {
-            var contractor = await _db.Contractors.FindAsync(contractorId);
+            var contractor = await _contractorRepository.GetByIdAsync(contractorId);
             if (contractor == null) return false;
 
-            // ensure worker references contractor
             worker.ContractorId = contractorId;
-            _db.Workforces.Add(worker);
-            await _db.SaveChangesAsync();
+            await _contractorRepository.AddWorkforceAsync(worker);
+            await _contractorRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<Contractor?> GetContractorDetailsAsync(int id)
         {
-            return await _db.Contractors
-                .Include(c => c.Workforces)
-                .FirstOrDefaultAsync(c => c.ContractorId == id);
+            return await _contractorRepository.GetByIdWithWorkforcesAsync(id);
         }
 
         public async Task<bool> UpdateContractorAsync(int id, Contractor updated)
         {
-            var existing = await _db.Contractors.FindAsync(id);
+            var existing = await _contractorRepository.GetByIdAsync(id);
             if (existing == null) return false;
 
             existing.ContractorName = updated.ContractorName;
             existing.Specialization = updated.Specialization;
             existing.ContactInfo = updated.ContactInfo;
 
-            _db.Contractors.Update(existing);
-            await _db.SaveChangesAsync();
+            await _contractorRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteContractorAsync(int id)
         {
-            var contractor = await _db.Contractors.FindAsync(id);
+            var contractor = await _contractorRepository.GetByIdAsync(id);
             if (contractor == null) return false;
 
-            _db.Contractors.Remove(contractor);
-            await _db.SaveChangesAsync();
+            _contractorRepository.Remove(contractor);
+            await _contractorRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<List<Contractor>> GetAllAsync()
         {
-            return await _db.Contractors.Include(c => c.Workforces).ToListAsync();
+            return await _contractorRepository.GetAllWithWorkforcesAsync();
         }
     }
 }

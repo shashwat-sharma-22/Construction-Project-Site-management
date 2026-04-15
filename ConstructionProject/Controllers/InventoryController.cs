@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConstructionProject.Controllers
@@ -8,14 +8,15 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class InventoryController : Controller
     {
-        private readonly InventoryService _service;
+        private readonly IInventoryService _service;
 
-        public InventoryController(InventoryService service)
+        public InventoryController(IInventoryService service)
         {
             _service = service;
         }
 
         [HttpGet("")]
+        [HttpGet("index")]
         public async Task<IActionResult> Index()
         {
             var equipment = await _service.GetAllEquipmentAsync();

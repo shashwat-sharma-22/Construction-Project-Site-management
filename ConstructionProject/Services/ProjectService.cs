@@ -1,60 +1,57 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class ProjectService
+    public class ProjectService : IProjectService
     {
-        private readonly AppDbContext _db;
+        private readonly IProjectRepository _projectRepository;
 
-        public ProjectService(AppDbContext db)
+        public ProjectService(IProjectRepository projectRepository)
         {
-            _db = db;
+            _projectRepository = projectRepository;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return await _db.Projects.ToListAsync();
+            return await _projectRepository.GetAllAsync();
         }
 
         public async Task<Project> CreateProjectAsync(Project project)
         {
-            _db.Projects.Add(project);
-            await _db.SaveChangesAsync();
+            await _projectRepository.AddAsync(project);
+            await _projectRepository.SaveChangesAsync();
             return project;
         }
 
         public async Task<Project?> GetProjectDetailsAsync(int id)
         {
-            return await _db.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
+            return await _projectRepository.GetByIdAsync(id);
         }
 
         public async Task<bool> UpdateProjectPlanAsync(int id, Project updated)
         {
-            var existing = await _db.Projects.FindAsync(id);
+            var existing = await _projectRepository.GetByIdAsync(id);
             if (existing == null) return false;
 
-            // update allowed fields
             existing.ProjectName = updated.ProjectName;
             existing.startDate = updated.startDate;
             existing.endDate = updated.endDate;
             existing.budget = updated.budget;
 
-            _db.Projects.Update(existing);
-            await _db.SaveChangesAsync();
+            await _projectRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteProjectAsync(int id)
         {
-            var project = await _db.Projects.FindAsync(id);
+            var project = await _projectRepository.GetByIdAsync(id);
             if (project == null) return false;
 
-            _db.Projects.Remove(project);
-            await _db.SaveChangesAsync();
+            _projectRepository.Remove(project);
+            await _projectRepository.SaveChangesAsync();
             return true;
         }
     }

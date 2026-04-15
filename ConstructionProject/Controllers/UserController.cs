@@ -1,6 +1,6 @@
 ﻿using ConstructionProject.DTOs;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +9,10 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class UserController : Controller
     {
-        private readonly UserService _service;
-        private readonly JwtTokenService _tokenService;
+        private readonly IUserService _service;
+        private readonly IJwtTokenService _tokenService;
 
-        public UserController(UserService service, JwtTokenService tokenService)
+        public UserController(IUserService service, IJwtTokenService tokenService)
         {
             _service = service;
             _tokenService = tokenService;
