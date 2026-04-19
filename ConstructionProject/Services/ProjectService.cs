@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ConstructionProject.Data;
 using ConstructionProject.Models;
@@ -17,7 +18,50 @@ namespace ConstructionProject.Services
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return await _db.Projects.ToListAsync();
+            return await _db.Projects.Include(p => p.Contractor).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Project>> SearchProjectsAsync(string searchTerm)
+        {
+            var query = _db.Projects.AsQueryable();
+
+            if (int.TryParse(searchTerm, out int id))
+            {
+                query = query.Where(p => p.ProjectId == id || (p.ProjectName != null && p.ProjectName.Contains(searchTerm)));
+            }
+            else
+            {
+                query = query.Where(p => p.ProjectName != null && p.ProjectName.Contains(searchTerm));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Project>> GetProjectsByContractorAsync(int contractorId)
+        {
+            return await _db.Projects
+                .Include(p => p.Contractor)
+                .Where(p => p.ContractorId == contractorId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Project>> SearchProjectsByContractorAsync(int contractorId, string searchTerm)
+        {
+            var query = _db.Projects
+                .Include(p => p.Contractor)
+                .Where(p => p.ContractorId == contractorId)
+                .AsQueryable();
+
+            if (int.TryParse(searchTerm, out int id))
+            {
+                query = query.Where(p => p.ProjectId == id || (p.ProjectName != null && p.ProjectName.Contains(searchTerm)));
+            }
+            else
+            {
+                query = query.Where(p => p.ProjectName != null && p.ProjectName.Contains(searchTerm));
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<Project> CreateProjectAsync(Project project)
@@ -29,7 +73,7 @@ namespace ConstructionProject.Services
 
         public async Task<Project?> GetProjectDetailsAsync(int id)
         {
-            return await _db.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
+            return await _db.Projects.Include(p => p.Contractor).FirstOrDefaultAsync(p => p.ProjectId == id);
         }
 
         public async Task<bool> UpdateProjectPlanAsync(int id, Project updated)
@@ -42,6 +86,7 @@ namespace ConstructionProject.Services
             existing.startDate = updated.startDate;
             existing.endDate = updated.endDate;
             existing.budget = updated.budget;
+            existing.ContractorId = updated.ContractorId;
 
             _db.Projects.Update(existing);
             await _db.SaveChangesAsync();

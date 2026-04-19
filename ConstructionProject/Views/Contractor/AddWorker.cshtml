@@ -1,0 +1,42 @@
+@model ConstructionProject.Models.Workforce
+
+@{
+    ViewData["Title"] = "Add Worker";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>➕ Add New Worker</h1>
+            <p class="text-muted">Adding workforce for: <strong>@ViewData["ContractorName"]</strong></p>
+            <hr />
+
+            <form asp-action="AddWorker" asp-controller="Contractor" method="post">
+                <input type="hidden" asp-for="ContractorId" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label">Worker Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter worker name" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Role" class="form-label">Worker Role</label>
+                    <input asp-for="Role" class="form-control" placeholder="e.g., Electrician, Plumber, Mason" />
+                    <span asp-validation-for="Role" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary me-2">Add Worker</button>
+                    <a href="@Url.Action("Workforce", "Contractor")" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

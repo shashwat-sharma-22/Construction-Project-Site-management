@@ -22,6 +22,14 @@ namespace ConstructionProject.Services
             return await _db.Progresses.Include(p => p.Project).ToListAsync();
         }
 
+        public async Task<IEnumerable<Progress>> GetProgressByProjectIdsAsync(IEnumerable<int> projectIds)
+        {
+            return await _db.Progresses
+                .Include(p => p.Project)
+                .Where(p => projectIds.Contains(p.ProjectId))
+                .ToListAsync();
+        }
+
         public async Task<Progress> RecordProgressAsync(Progress progress)
         {
             _db.Progresses.Add(progress);

@@ -4,6 +4,7 @@ using ConstructionProject.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConstructionProject.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260419051346_AddContractorToProjectAndWorkerToTask")]
+    partial class AddContractorToProjectAndWorkerToTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,7 +67,7 @@ namespace ConstructionProject.Migrations
                             Email = "admin@construction.com",
                             IsActive = true,
                             Name = "Super Admin",
-                            PasswordHash = "$2a$11$N4bdM4jG5Gcc9rylWnEoQ.0.zCJYmfJyQoKfxNK/Q28jZLr/47czO",
+                            PasswordHash = "$2a$11$WXnUBBpFvcjW4PMdTGes8.FL96u4OnvYkBitmW6aDScyRZIGvXxVm",
                             Role = 0
                         });
                 });
@@ -201,6 +204,9 @@ namespace ConstructionProject.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskId"));
+
+                    b.Property<string>("AssignedTo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");

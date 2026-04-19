@@ -21,6 +21,38 @@ namespace ConstructionProject.Services
             return await _db.Contractors.Include(c => c.Workforces).ToListAsync();
         }
 
+        public async Task<IEnumerable<Contractor>> SearchContractorsAsync(string searchTerm)
+        {
+            var query = _db.Contractors.Include(c => c.Workforces).AsQueryable();
+
+            if (int.TryParse(searchTerm, out int id))
+            {
+                query = query.Where(c => c.ContractorId == id || (c.ContractorName != null && c.ContractorName.Contains(searchTerm)));
+            }
+            else
+            {
+                query = query.Where(c => c.ContractorName != null && c.ContractorName.Contains(searchTerm));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Workforce>> SearchWorkforceAsync(int contractorId, string searchTerm)
+        {
+            var query = _db.Workforces.Where(w => w.ContractorId == contractorId).AsQueryable();
+
+            if (int.TryParse(searchTerm, out int id))
+            {
+                query = query.Where(w => w.WorkerId == id || (w.Name != null && w.Name.Contains(searchTerm)));
+            }
+            else
+            {
+                query = query.Where(w => w.Name != null && w.Name.Contains(searchTerm));
+            }
+
+            return await query.ToListAsync();
+        }
+
         public async Task<Contractor> AddContractorAsync(Contractor contractor)
         {
             _db.Contractors.Add(contractor);
@@ -74,6 +106,44 @@ namespace ConstructionProject.Services
         public async Task<List<Contractor>> GetAllAsync()
         {
             return await _db.Contractors.Include(c => c.Workforces).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Contractor>> GetAvailableContractorsAsync()
+        {
+            var assignedIds = await _db.Projects
+                .Where(p => p.ContractorId != null)
+                .Select(p => p.ContractorId!.Value)
+                .ToListAsync();
+
+            return await _db.Contractors
+                .Where(c => !assignedIds.Contains(c.ContractorId))
+                .Include(c => c.Workforces)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Workforce>> GetWorkforceByContractorAsync(int contractorId)
+        {
+            return await _db.Workforces
+                .Where(w => w.ContractorId == contractorId)
+                .ToListAsync();
+        }
+
+        public async Task<Contractor?> GetContractorByEmailAsync(string email)
+        {
+            return await _db.Contractors
+                .Include(c => c.Workforces)
+                .FirstOrDefaultAsync(c => c.ContactInfo == email);
+        }
+
+        public async Task<bool> RemoveWorkerAsync(int workerId, int contractorId)
+        {
+            var worker = await _db.Workforces
+                .FirstOrDefaultAsync(w => w.WorkerId == workerId && w.ContractorId == contractorId);
+            if (worker == null) return false;
+
+            _db.Workforces.Remove(worker);
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }

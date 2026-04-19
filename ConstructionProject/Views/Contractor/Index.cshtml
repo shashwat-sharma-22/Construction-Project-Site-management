@@ -13,6 +13,19 @@
             <a href="@Url.Action("Create", "Contractor")" class="btn btn-primary">
                 <i class="bi bi-plus"></i> Add Contractor
             </a>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                🏠 Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <form method="get" asp-action="Index" asp-controller="Contractor" class="d-flex">
+                <input type="text" name="search" value="@ViewData["CurrentSearch"]" class="form-control me-2" placeholder="Search by Contractor ID or Name..." />
+                <button type="submit" class="btn btn-outline-primary me-2">Search</button>
+                <a href="@Url.Action("Index", "Contractor")" class="btn btn-outline-secondary">Clear</a>
+            </form>
         </div>
     </div>
 
