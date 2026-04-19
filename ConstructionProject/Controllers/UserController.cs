@@ -1,19 +1,18 @@
 ﻿using ConstructionProject.DTOs;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConstructionProject.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class UserController : Controller
     {
-        private readonly UserService _service;
-        private readonly JwtTokenService _tokenService;
+        private readonly IUserService _service;
+        private readonly IJwtTokenService _tokenService;
 
-        public UserController(UserService service, JwtTokenService tokenService)
+        public UserController(IUserService service, IJwtTokenService tokenService)
         {
             _service = service;
             _tokenService = tokenService;
@@ -57,28 +56,28 @@ namespace ConstructionProject.Controllers
             if (user == null)
                 return Conflict(new { message = "Email already exists." });
 
-            return CreatedAtAction(nameof(GetById),
-                                   new { id = user.UserId }, user);
+            return View(user);
         }
 
         // GET api/user  — Admin only
-        [HttpGet]
+        [HttpGet("")]
+        [HttpGet("index")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Index()
         {
             var users = await _service.GetAllUsers();
-            return Ok(users);
+            return View(users);
         }
 
         // GET api/user/5  — Admin only
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var user = await _service.GetUserById(id);
             if (user == null)
                 return NotFound(new { message = $"User {id} not found." });
-            return Ok(user);
+            return View(user);
         }
 
         // GET api/user/role/SiteEngineer  — Admin, ProjectManager
@@ -87,11 +86,11 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> GetByRole(UserRole role)
         {
             var users = await _service.GetUsersByRole(role);
-            return Ok(users);
+            return View(users);
         }
 
         // PUT api/user/5/role  — Admin only
-        [HttpPut("{id}/role")]
+        [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateRole(int id,
                                                     [FromBody] UpdateRoleDto dto)
@@ -99,7 +98,7 @@ namespace ConstructionProject.Controllers
             var user = await _service.UpdateRole(id, dto.NewRole);
             if (user == null)
                 return NotFound(new { message = $"User {id} not found." });
-            return Ok(user);
+            return View(user);
         }
 
         // PUT api/user/5/deactivate  — Admin only
@@ -110,7 +109,7 @@ namespace ConstructionProject.Controllers
             var result = await _service.SetActiveStatus(id, false);
             if (!result)
                 return NotFound(new { message = $"User {id} not found." });
-            return Ok(new { message = "User deactivated." });
+            return RedirectToAction("Index");
         }
 
         // PUT api/user/5/activate  — Admin only
@@ -121,18 +120,18 @@ namespace ConstructionProject.Controllers
             var result = await _service.SetActiveStatus(id, true);
             if (!result)
                 return NotFound(new { message = $"User {id} not found." });
-            return Ok(new { message = "User activated." });
+            return RedirectToAction("Index");
         }
 
         // DELETE api/user/5  — Admin only
-        [HttpDelete("{id}")]
+        [HttpPost("delete/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteUser(id);
             if (!result)
                 return NotFound(new { message = $"User {id} not found." });
-            return Ok(new { message = "User deleted." });
+            return RedirectToAction("Index");
         }
     }
 }

@@ -10,7 +10,7 @@ namespace ConstructionProject.Models
 
         [Required]
         [MaxLength(100)]
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal QuantityAvailable { get; set; }

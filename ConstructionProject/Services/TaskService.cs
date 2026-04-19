@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class TaskService
+    public class TaskService : ITaskService
     {
         private readonly AppDbContext _db;
 

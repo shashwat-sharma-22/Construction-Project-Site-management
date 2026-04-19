@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConstructionProject.Controllers
@@ -8,9 +8,9 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class ContractorController : Controller
     {
-        private readonly ContractorService _service;
+        private readonly IContractorService _service;
 
-        public ContractorController(ContractorService service)
+        public ContractorController(IContractorService service)
         {
             _service = service;
         }
@@ -92,6 +92,7 @@ namespace ConstructionProject.Controllers
             }
             return View(contractor);
         }
+
 
         [HttpPost("delete/{id}")]
         public async Task<IActionResult> Delete(int id)

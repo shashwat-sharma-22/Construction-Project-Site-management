@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using ConstructionProject.Models;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,11 +10,11 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class TaskController : Controller
     {
-        private readonly TaskService _taskService;
-        private readonly ProjectService _projectService;
-        private readonly ContractorService _contractorService;
+        private readonly ITaskService _taskService;
+        private readonly IProjectService _projectService;
+        private readonly IContractorService _contractorService;
 
-        public TaskController(TaskService taskService, ProjectService projectService, ContractorService contractorService)
+        public TaskController(ITaskService taskService, IProjectService projectService, IContractorService contractorService)
         {
             _taskService = taskService;
             _projectService = projectService;

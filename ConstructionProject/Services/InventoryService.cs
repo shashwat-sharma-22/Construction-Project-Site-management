@@ -1,95 +1,91 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class InventoryService
+    public class InventoryService : IInventoryService
     {
-        private readonly AppDbContext _db;
+        private readonly IInventoryRepository _inventoryRepository;
 
-        public InventoryService(AppDbContext db)
+        public InventoryService(IInventoryRepository inventoryRepository)
         {
-            _db = db;
+            _inventoryRepository = inventoryRepository;
         }
 
         public async Task<Material> AddMaterialAsync(Material material)
         {
-            _db.Materials.Add(material);
-            await _db.SaveChangesAsync();
+            await _inventoryRepository.AddMaterialAsync(material);
+            await _inventoryRepository.SaveChangesAsync();
             return material;
         }
 
         public async Task<Equipment> AddEquipmentAsync(Equipment equipment)
         {
-            _db.Equipments.Add(equipment);
-            await _db.SaveChangesAsync();
+            await _inventoryRepository.AddEquipmentAsync(equipment);
+            await _inventoryRepository.SaveChangesAsync();
             return equipment;
         }
 
         public async Task<bool> AssignEquipmentAsync(int equipmentId, int projectTaskId)
         {
-            var equipment = await _db.Equipments.FindAsync(equipmentId);
+            var equipment = await _inventoryRepository.GetEquipmentByIdAsync(equipmentId);
             if (equipment == null) return false;
 
-            var task = await _db.Tasks.FindAsync(projectTaskId);
+            var task = await _inventoryRepository.GetTaskByIdAsync(projectTaskId);
             if (task == null) return false;
 
             equipment.Status = EquipmentStatus.IN_USE;
-            _db.Equipments.Update(equipment);
-            await _db.SaveChangesAsync();
+            await _inventoryRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> UpdateMaterialQuantityAsync(int materialId, decimal quantityChange)
         {
-            var material = await _db.Materials.FindAsync(materialId);
+            var material = await _inventoryRepository.GetMaterialByIdAsync(materialId);
             if (material == null) return false;
 
             material.QuantityAvailable += quantityChange;
-            _db.Materials.Update(material);
-            await _db.SaveChangesAsync();
+            await _inventoryRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> UpdateEquipmentStatusAsync(int equipmentId, EquipmentStatus status)
         {
-            var equipment = await _db.Equipments.FindAsync(equipmentId);
+            var equipment = await _inventoryRepository.GetEquipmentByIdAsync(equipmentId);
             if (equipment == null) return false;
 
             equipment.Status = status;
-            _db.Equipments.Update(equipment);
-            await _db.SaveChangesAsync();
+            await _inventoryRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<Material?> GetMaterialAsync(int id)
         {
-            return await _db.Materials.FirstOrDefaultAsync(m => m.MaterialId == id);
+            return await _inventoryRepository.GetMaterialByIdAsync(id);
         }
 
         public async Task<Equipment?> GetEquipmentAsync(int id)
         {
-            return await _db.Equipments.FirstOrDefaultAsync(e => e.EquipmentId == id);
+            return await _inventoryRepository.GetEquipmentByIdAsync(id);
         }
 
         public async Task<List<Material>> GetAllMaterialsAsync()
         {
-            return await _db.Materials.ToListAsync();
+            return await _inventoryRepository.GetAllMaterialsAsync();
         }
 
         public async Task<List<Equipment>> GetAllEquipmentAsync()
         {
-            return await _db.Equipments.ToListAsync();
+            return await _inventoryRepository.GetAllEquipmentAsync();
         }
 
         public async Task<InventoryStatus> GetInventoryStatusAsync()
         {
-            var materials = await _db.Materials.ToListAsync();
-            var equipments = await _db.Equipments.ToListAsync();
+            var materials = await _inventoryRepository.GetAllMaterialsAsync();
+            var equipments = await _inventoryRepository.GetAllEquipmentAsync();
 
             return new InventoryStatus
             {

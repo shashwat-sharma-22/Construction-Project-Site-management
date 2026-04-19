@@ -1,29 +1,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class ProjectService
+    public class ProjectService : IProjectService
     {
-        private readonly AppDbContext _db;
+        private readonly IProjectRepository _projectRepository;
 
-        public ProjectService(AppDbContext db)
+        public ProjectService(IProjectRepository projectRepository)
         {
-            _db = db;
+            _projectRepository = projectRepository;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return await _db.Projects.Include(p => p.Contractor).ToListAsync();
+            return await _projectRepository.GetAllWithContractorAsync();
         }
 
         public async Task<IEnumerable<Project>> SearchProjectsAsync(string searchTerm)
         {
-            var query = _db.Projects.AsQueryable();
+            var query = _projectRepository.Query().AsQueryable();
 
             if (int.TryParse(searchTerm, out int id))
             {
@@ -39,7 +39,7 @@ namespace ConstructionProject.Services
 
         public async Task<IEnumerable<Project>> GetProjectsByContractorAsync(int contractorId)
         {
-            return await _db.Projects
+            return await _projectRepository.Query()
                 .Include(p => p.Contractor)
                 .Where(p => p.ContractorId == contractorId)
                 .ToListAsync();
@@ -47,7 +47,7 @@ namespace ConstructionProject.Services
 
         public async Task<IEnumerable<Project>> SearchProjectsByContractorAsync(int contractorId, string searchTerm)
         {
-            var query = _db.Projects
+            var query = _projectRepository.Query()
                 .Include(p => p.Contractor)
                 .Where(p => p.ContractorId == contractorId)
                 .AsQueryable();
@@ -66,40 +66,38 @@ namespace ConstructionProject.Services
 
         public async Task<Project> CreateProjectAsync(Project project)
         {
-            _db.Projects.Add(project);
-            await _db.SaveChangesAsync();
+            await _projectRepository.AddAsync(project);
+            await _projectRepository.SaveChangesAsync();
             return project;
         }
 
         public async Task<Project?> GetProjectDetailsAsync(int id)
         {
-            return await _db.Projects.Include(p => p.Contractor).FirstOrDefaultAsync(p => p.ProjectId == id);
+            return await _projectRepository.GetByIdWithContractorAsync(id);
         }
 
         public async Task<bool> UpdateProjectPlanAsync(int id, Project updated)
         {
-            var existing = await _db.Projects.FindAsync(id);
+            var existing = await _projectRepository.GetByIdAsync(id);
             if (existing == null) return false;
 
-            // update allowed fields
             existing.ProjectName = updated.ProjectName;
             existing.startDate = updated.startDate;
             existing.endDate = updated.endDate;
             existing.budget = updated.budget;
             existing.ContractorId = updated.ContractorId;
 
-            _db.Projects.Update(existing);
-            await _db.SaveChangesAsync();
+            await _projectRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteProjectAsync(int id)
         {
-            var project = await _db.Projects.FindAsync(id);
+            var project = await _projectRepository.GetByIdAsync(id);
             if (project == null) return false;
 
-            _db.Projects.Remove(project);
-            await _db.SaveChangesAsync();
+            _projectRepository.Remove(project);
+            await _projectRepository.SaveChangesAsync();
             return true;
         }
     }

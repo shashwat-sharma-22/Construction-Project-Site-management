@@ -2,29 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ConstructionProject.Data;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class ProgressService
+    public class ProgressService : IProgressService
     {
-        private readonly AppDbContext _db;
+        private readonly IProgressRepository _progressRepository;
 
-        public ProgressService(AppDbContext db)
+        public ProgressService(IProgressRepository progressRepository)
         {
-            _db = db;
+            _progressRepository = progressRepository;
         }
 
         public async Task<IEnumerable<Progress>> GetAllProgressAsync()
         {
-            return await _db.Progresses.Include(p => p.Project).ToListAsync();
+            return await _progressRepository.GetAllWithProjectAsync();
         }
 
         public async Task<IEnumerable<Progress>> GetProgressByProjectIdsAsync(IEnumerable<int> projectIds)
         {
-            return await _db.Progresses
+            return await _progressRepository.Query()
                 .Include(p => p.Project)
                 .Where(p => projectIds.Contains(p.ProjectId))
                 .ToListAsync();
@@ -32,14 +32,14 @@ namespace ConstructionProject.Services
 
         public async Task<Progress> RecordProgressAsync(Progress progress)
         {
-            _db.Progresses.Add(progress);
-            await _db.SaveChangesAsync();
+            await _progressRepository.AddAsync(progress);
+            await _progressRepository.SaveChangesAsync();
             return progress;
         }
 
         public async Task<Progress?> UpdateProgressAsync(int id, Progress updated)
         {
-            var existing = await _db.Progresses.FindAsync(id);
+            var existing = await _progressRepository.GetByIdAsync(id);
             if (existing == null) return null;
 
             existing.ProjectId = updated.ProjectId;
@@ -47,31 +47,28 @@ namespace ConstructionProject.Services
             existing.CompletedTasks = updated.CompletedTasks;
             existing.Remarks = updated.Remarks;
 
-            _db.Progresses.Update(existing);
-            await _db.SaveChangesAsync();
+            await _progressRepository.SaveChangesAsync();
             return existing;
         }
 
         public async Task<Progress?> GetByIdAsync(int id)
         {
-            return await _db.Progresses
-                .Include(p => p.Project)
-                .FirstOrDefaultAsync(p => p.ProgressId == id);
+            return await _progressRepository.GetByIdWithProjectAsync(id);
         }
 
         public async Task<bool> DeleteProgressAsync(int id)
         {
-            var progress = await _db.Progresses.FindAsync(id);
+            var progress = await _progressRepository.GetByIdAsync(id);
             if (progress == null) return false;
 
-            _db.Progresses.Remove(progress);
-            await _db.SaveChangesAsync();
+            _progressRepository.Remove(progress);
+            await _progressRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<IEnumerable<Progress>> GetProgressReportAsync(int projectId, DateTime? start = null, DateTime? end = null)
         {
-            var query = _db.Progresses.AsQueryable();
+            var query = _progressRepository.Query();
 
             if (projectId > 0)
                 query = query.Where(p => p.ProjectId == projectId);
@@ -82,7 +79,7 @@ namespace ConstructionProject.Services
             if (end.HasValue)
                 query = query.Where(p => p.ReportDate <= end.Value.Date);
 
-            return await query.OrderBy(p => p.ReportDate).ToListAsync();
+            return await Task.FromResult(query.OrderBy(p => p.ReportDate).ToList());
         }
     }
 }

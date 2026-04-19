@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using ConstructionProject.DTOs;
-using ConstructionProject.Services;
+using ConstructionProject.Interfaces;
 using System.Threading.Tasks;
 
 namespace ConstructionProject.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserService _userService;
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IUserService _userService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public AccountController(UserService userService, JwtTokenService jwtTokenService)
+        public AccountController(IUserService userService, IJwtTokenService jwtTokenService)
         {
             _userService = userService;
             _jwtTokenService = jwtTokenService;
@@ -26,7 +26,11 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Login([FromForm] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
+            {
                 return View(loginDto);
+            }
+                
+
 
             var user = await _userService.ValidateLogin(loginDto);
             if (user == null)
@@ -47,7 +51,7 @@ namespace ConstructionProject.Controllers
             });
 
             // Store user info in cookies for easier access
-            Response.Cookies.Append("userEmail", user.Email, new Microsoft.AspNetCore.Http.CookieOptions
+            Response.Cookies.Append("userEmail", user.Email ?? "", new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = false,
                 Secure = true,

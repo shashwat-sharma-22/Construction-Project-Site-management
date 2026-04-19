@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
@@ -10,10 +10,10 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class ProjectController : Controller
     {
-        private readonly ProjectService _service;
-        private readonly ContractorService _contractorService;
+private readonly IProjectService _service;
+private readonly IContractorService _contractorService;
 
-        public ProjectController(ProjectService service, ContractorService contractorService)
+public ProjectController(IProjectService service, IContractorService contractorService)
         {
             _service = service;
             _contractorService = contractorService;

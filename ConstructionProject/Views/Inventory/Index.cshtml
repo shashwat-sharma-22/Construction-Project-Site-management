@@ -36,7 +36,15 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
+                    
                     <tbody>
+                        @foreach (var item in ViewBag.Equipment)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.Status</td>
+                            </tr>
+                        }
                         <tr>
                             <td>Sample Equipment</td>
                             <td><span class="badge bg-success">AVAILABLE</span></td>
