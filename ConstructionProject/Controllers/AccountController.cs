@@ -78,30 +78,6 @@ namespace ConstructionProject.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet("Account/Register")]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost("Account/Register")]
-        public async Task<IActionResult> Register([FromForm] RegisterUserDto registerDto)
-        {
-            if (!ModelState.IsValid)
-                return View(registerDto);
-
-            var result = await _userService.RegisterUser(registerDto);
-            if (result == null)
-            {
-                ModelState.AddModelError("", "Email already exists or registration failed");
-                return View(registerDto);
-            }
-
-            // Redirect to login after successful registration
-            TempData["SuccessMessage"] = "Registration successful! Please login with your credentials.";
-            return RedirectToAction("Login");
-        }
-
         [HttpGet("Account/Profile")]
         public async Task<IActionResult> Profile()
         {

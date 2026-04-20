@@ -43,10 +43,17 @@ namespace ConstructionProject.Controllers
             return Ok(response);
         }
 
-        // POST api/user/register  — Admin only
-        [HttpPost("register")]
+        [HttpGet("create")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST api/user/register  — Admin only
+        [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([FromBody] RegisterUserDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,7 +63,7 @@ namespace ConstructionProject.Controllers
             if (user == null)
                 return Conflict(new { message = "Email already exists." });
 
-            return View(user);
+            return Ok(user);
         }
 
         // GET api/user  — Admin only
@@ -89,16 +96,26 @@ namespace ConstructionProject.Controllers
             return View(users);
         }
 
-        // PUT api/user/5/role  — Admin only
+        // GET api/user/edit/5  — Admin only
         [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateRole(int id,
-                                                    [FromBody] UpdateRoleDto dto)
+        public async Task<IActionResult> Edit(int id)
+        {
+            var user = await _service.GetUserById(id);
+            if (user == null)
+                return NotFound(new { message = $"User {id} not found." });
+            return View(user);
+        }
+
+        // PUT api/user/5/role  — Admin only
+        [HttpPut("{id}/role")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleDto dto)
         {
             var user = await _service.UpdateRole(id, dto.NewRole);
             if (user == null)
                 return NotFound(new { message = $"User {id} not found." });
-            return View(user);
+            return Ok(user);
         }
 
         // PUT api/user/5/deactivate  — Admin only
