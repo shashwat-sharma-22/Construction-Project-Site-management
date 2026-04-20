@@ -29,8 +29,6 @@ namespace ConstructionProject.Controllers
             {
                 return View(loginDto);
             }
-                
-
 
             var user = await _userService.ValidateLogin(loginDto);
             if (user == null)
@@ -41,22 +39,28 @@ namespace ConstructionProject.Controllers
 
             var token = _jwtTokenService.GenerateToken(user);
 
-            // Store token in cookie
+            var cookieExpiry = System.DateTimeOffset.UtcNow.AddHours(1);
+
             Response.Cookies.Append("authToken", token, new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-                Expires = System.DateTimeOffset.UtcNow.AddHours(1)
+                Expires = cookieExpiry
             });
 
-            // Store user info in cookies for easier access
-            Response.Cookies.Append("userEmail", user.Email ?? "", new Microsoft.AspNetCore.Http.CookieOptions
+            string email = "";
+            if (user.Email != null)
+            {
+                email = user.Email;
+            }
+
+            Response.Cookies.Append("userEmail", email, new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = false,
                 Secure = true,
                 SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-                Expires = System.DateTimeOffset.UtcNow.AddHours(1)
+                Expires = cookieExpiry
             });
 
             Response.Cookies.Append("userRole", user.Role.ToString(), new Microsoft.AspNetCore.Http.CookieOptions
@@ -64,7 +68,7 @@ namespace ConstructionProject.Controllers
                 HttpOnly = false,
                 Secure = true,
                 SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-                Expires = System.DateTimeOffset.UtcNow.AddHours(1)
+                Expires = cookieExpiry
             });
 
             Response.Cookies.Append("userId", user.UserId.ToString(), new Microsoft.AspNetCore.Http.CookieOptions
@@ -72,7 +76,7 @@ namespace ConstructionProject.Controllers
                 HttpOnly = false,
                 Secure = true,
                 SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-                Expires = System.DateTimeOffset.UtcNow.AddHours(1)
+                Expires = cookieExpiry
             });
 
             return RedirectToAction("Index", "Home");
@@ -88,7 +92,9 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Register([FromForm] RegisterUserDto registerDto)
         {
             if (!ModelState.IsValid)
+            {
                 return View(registerDto);
+            }
 
             var result = await _userService.RegisterUser(registerDto);
             if (result == null)
@@ -97,7 +103,6 @@ namespace ConstructionProject.Controllers
                 return View(registerDto);
             }
 
-            // Redirect to login after successful registration
             TempData["SuccessMessage"] = "Registration successful! Please login with your credentials.";
             return RedirectToAction("Login");
         }
@@ -107,12 +112,16 @@ namespace ConstructionProject.Controllers
         {
             var userEmail = Request.Cookies["userEmail"];
             if (string.IsNullOrEmpty(userEmail))
+            {
                 return RedirectToAction("Login");
+            }
 
             var users = await _userService.GetAllUsers();
             var userDto = users.FirstOrDefault(u => u.Email == userEmail);
             if (userDto == null)
+            {
                 return NotFound();
+            }
 
             return View(userDto);
         }
@@ -120,7 +129,6 @@ namespace ConstructionProject.Controllers
         [HttpPost("Account/Logout")]
         public IActionResult Logout()
         {
-            // Delete all auth cookies
             Response.Cookies.Delete("authToken");
             Response.Cookies.Delete("userEmail");
             Response.Cookies.Delete("userRole");

@@ -20,11 +20,19 @@ namespace ConstructionProject.Controllers
         {
             var userRole = GetUserRole();
             if (userRole == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
-            var contractors = string.IsNullOrWhiteSpace(search)
-                ? await _service.GetAllContractorsAsync()
-                : await _service.SearchContractorsAsync(search.Trim());
+            List<Contractor> contractors;
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                contractors = (await _service.GetAllContractorsAsync()).ToList();
+            }
+            else
+            {
+                contractors = (await _service.SearchContractorsAsync(search.Trim())).ToList();
+            }
 
             ViewData["CurrentSearch"] = search;
             return View(contractors);
@@ -35,10 +43,15 @@ namespace ConstructionProject.Controllers
         {
             var userRole = GetUserRole();
             if (userRole == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
             var contractor = await _service.GetContractorDetailsAsync(id);
-            if (contractor == null) return NotFound();
+            if (contractor == null)
+            {
+                return NotFound();
+            }
             return View(contractor);
         }
 
@@ -46,7 +59,9 @@ namespace ConstructionProject.Controllers
         public IActionResult Create()
         {
             if (GetUserRole() == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
             return View();
         }
@@ -55,12 +70,14 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Create([FromForm] Contractor contractor)
         {
             if (GetUserRole() == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
             if (ModelState.IsValid)
             {
                 var created = await _service.AddContractorAsync(contractor);
-                return RedirectToAction(nameof(Details), new { id = created.ContractorId });
+                return RedirectToAction("Details", new { id = created.ContractorId });
             }
             return View(contractor);
         }
@@ -69,10 +86,15 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             if (GetUserRole() == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
             var contractor = await _service.GetContractorDetailsAsync(id);
-            if (contractor == null) return NotFound();
+            if (contractor == null)
+            {
+                return NotFound();
+            }
             return View(contractor);
         }
 
@@ -80,39 +102,51 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Edit(int id, [FromForm] Contractor contractor)
         {
             if (GetUserRole() == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
-            if (id != contractor.ContractorId) return BadRequest();
+            if (id != contractor.ContractorId)
+            {
+                return BadRequest();
+            }
 
             if (ModelState.IsValid)
             {
                 var ok = await _service.UpdateContractorAsync(id, contractor);
-                if (!ok) return NotFound();
-                return RedirectToAction(nameof(Index));
+                if (!ok)
+                {
+                    return NotFound();
+                }
+                return RedirectToAction("Index");
             }
             return View(contractor);
         }
-
 
         [HttpPost("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             if (GetUserRole() == "Contractor")
+            {
                 return RedirectToAction("Index", "Home");
+            }
 
             var ok = await _service.DeleteContractorAsync(id);
-            if (!ok) return NotFound();
-            return RedirectToAction(nameof(Index));
+            if (!ok)
+            {
+                return NotFound();
+            }
+            return RedirectToAction("Index");
         }
-
-        // ===== Workforce Management (for Contractor role) =====
 
         [HttpGet("workforce")]
         public async Task<IActionResult> Workforce(string? search)
         {
             var userRole = GetUserRole();
             if (userRole != "Contractor")
-                return RedirectToAction(nameof(Index));
+            {
+                return RedirectToAction("Index");
+            }
 
             var contractor = await GetCurrentContractorAsync();
             if (contractor == null)
@@ -135,10 +169,15 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> AddWorker()
         {
             if (GetUserRole() != "Contractor")
-                return RedirectToAction(nameof(Index));
+            {
+                return RedirectToAction("Index");
+            }
 
             var contractor = await GetCurrentContractorAsync();
-            if (contractor == null) return RedirectToAction("Workforce");
+            if (contractor == null)
+            {
+                return RedirectToAction("Workforce");
+            }
 
             ViewData["ContractorId"] = contractor.ContractorId;
             ViewData["ContractorName"] = contractor.ContractorName;
@@ -149,10 +188,15 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> AddWorker([FromForm] Workforce worker)
         {
             if (GetUserRole() != "Contractor")
-                return RedirectToAction(nameof(Index));
+            {
+                return RedirectToAction("Index");
+            }
 
             var contractor = await GetCurrentContractorAsync();
-            if (contractor == null) return RedirectToAction("Workforce");
+            if (contractor == null)
+            {
+                return RedirectToAction("Workforce");
+            }
 
             worker.ContractorId = contractor.ContractorId;
 
@@ -171,10 +215,15 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> RemoveWorker(int id)
         {
             if (GetUserRole() != "Contractor")
-                return RedirectToAction(nameof(Index));
+            {
+                return RedirectToAction("Index");
+            }
 
             var contractor = await GetCurrentContractorAsync();
-            if (contractor == null) return RedirectToAction("Workforce");
+            if (contractor == null)
+            {
+                return RedirectToAction("Workforce");
+            }
 
             await _service.RemoveWorkerAsync(id, contractor.ContractorId);
             return RedirectToAction("Workforce");
@@ -182,18 +231,45 @@ namespace ConstructionProject.Controllers
 
         private string GetUserRole()
         {
-            return User.FindFirst("role")?.Value ?? Request.Cookies["userRole"] ?? "User";
+            var roleClaim = User.FindFirst("role");
+            if (roleClaim != null)
+            {
+                return roleClaim.Value;
+            }
+
+            var roleCookie = Request.Cookies["userRole"];
+            if (roleCookie != null)
+            {
+                return roleCookie;
+            }
+
+            return "User";
         }
 
         private string GetUserEmail()
         {
-            return User.FindFirst("email")?.Value ?? Request.Cookies["userEmail"] ?? "";
+            var emailClaim = User.FindFirst("email");
+            if (emailClaim != null)
+            {
+                return emailClaim.Value;
+            }
+
+            var emailCookie = Request.Cookies["userEmail"];
+            if (emailCookie != null)
+            {
+                return emailCookie;
+            }
+
+            return "";
         }
 
         private async Task<Contractor?> GetCurrentContractorAsync()
         {
             var email = GetUserEmail();
-            if (string.IsNullOrEmpty(email)) return null;
+            if (string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
             return await _service.GetContractorByEmailAsync(email);
         }
     }
