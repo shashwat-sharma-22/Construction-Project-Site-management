@@ -47,7 +47,8 @@
 
                     <div class="mt-4">
                         <a href="@Url.Action("Edit", "Contractor", new { id = Model.ContractorId })" class="btn btn-warning me-2">Edit</a>
-                        <a href="@Url.Action("Index", "Contractor")" class="btn btn-secondary">Back</a>
+                        <a href="@Url.Action("Index", "Contractor")" class="btn btn-secondary me-2">Back to Contractors</a>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">🏠 Dashboard</a>
                         <a href="@Url.Action("Delete", "Contractor", new { id = Model.ContractorId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                     </div>
                 </div>

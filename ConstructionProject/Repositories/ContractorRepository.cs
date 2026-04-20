@@ -46,6 +46,41 @@ namespace ConstructionProject.Repositories
             _db.Contractors.Remove(contractor);
         }
 
+        public IQueryable<Contractor> QueryContractors()
+        {
+            return _db.Contractors.AsQueryable();
+        }
+
+        public IQueryable<Workforce> QueryWorkforces()
+        {
+            return _db.Workforces.AsQueryable();
+        }
+
+        public Task<Contractor?> GetByEmailAsync(string email)
+        {
+            return _db.Contractors
+                .Include(c => c.Workforces)
+                .FirstOrDefaultAsync(c => c.ContactInfo == email);
+        }
+
+        public Task<Workforce?> GetWorkerAsync(int workerId, int contractorId)
+        {
+            return _db.Workforces
+                .FirstOrDefaultAsync(w => w.WorkerId == workerId && w.ContractorId == contractorId);
+        }
+
+        public void RemoveWorker(Workforce worker)
+        {
+            _db.Workforces.Remove(worker);
+        }
+
+        public Task<List<Workforce>> GetWorkforceByContractorAsync(int contractorId)
+        {
+            return _db.Workforces
+                .Where(w => w.ContractorId == contractorId)
+                .ToListAsync();
+        }
+
         public Task SaveChangesAsync()
         {
             return _db.SaveChangesAsync();

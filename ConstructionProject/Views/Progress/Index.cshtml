@@ -10,8 +10,14 @@
             <h1>📊 Project Progress</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="@Url.Action("Create", "Progress")" class="btn btn-primary">
-                <i class="bi bi-plus"></i> Log Progress
+            @if (ViewData["UserRole"]?.ToString() == "SiteEngineer")
+            {
+                <a href="@Url.Action("Create", "Progress")" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Log Progress
+                </a>
+            }
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                🏠 Dashboard
             </a>
         </div>
     </div>
@@ -39,12 +45,15 @@
                             <td>@progress.Remarks</td>
                             <td>
                                 <a href="@Url.Action("Details", "Progress", new { id = progress.ProgressId })" class="btn btn-info btn-sm">View</a>
-                                <a href="@Url.Action("Edit", "Progress", new { id = progress.ProgressId })" class="btn btn-warning btn-sm">Edit</a>
-                                <form asp-action="Delete" asp-controller="Progress" asp-route-id="@progress.ProgressId" method="post" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?)">
-                                        Delete
-                                    </button>
-                                </form>
+                                @if (ViewData["UserRole"]?.ToString() == "SiteEngineer")
+                                {
+                                    <a href="@Url.Action("Edit", "Progress", new { id = progress.ProgressId })" class="btn btn-warning btn-sm">Edit</a>
+                                    <form asp-action="Delete" asp-controller="Progress" asp-route-id="@progress.ProgressId" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                }
                             </td>
                         </tr>
                     }
@@ -56,8 +65,15 @@
     {
         <div class="alert alert-info text-center py-5">
             <h5>No progress reports found</h5>
-            <p>Create your first progress report.</p>
-            <a href="@Url.Action("Create", "Progress")" class="btn btn-primary">Log Progress</a>
+            @if (ViewData["UserRole"]?.ToString() == "SiteEngineer")
+            {
+                <p>Create your first progress report.</p>
+                <a href="@Url.Action("Create", "Progress")" class="btn btn-primary">Log Progress</a>
+            }
+            else
+            {
+                <p>No progress has been logged yet.</p>
+            }
         </div>
     }
 </div>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
@@ -19,6 +20,14 @@ namespace ConstructionProject.Services
         public async Task<IEnumerable<Progress>> GetAllProgressAsync()
         {
             return await _progressRepository.GetAllWithProjectAsync();
+        }
+
+        public async Task<IEnumerable<Progress>> GetProgressByProjectIdsAsync(IEnumerable<int> projectIds)
+        {
+            return await _progressRepository.Query()
+                .Include(p => p.Project)
+                .Where(p => projectIds.Contains(p.ProjectId))
+                .ToListAsync();
         }
 
         public async Task<Progress> RecordProgressAsync(Progress progress)

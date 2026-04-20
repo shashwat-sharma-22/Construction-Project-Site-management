@@ -41,9 +41,17 @@
                     }
 
                     <div class="mt-4">
-                        <a href="@Url.Action("Edit", "Progress", new { id = Model.ProgressId })" class="btn btn-warning me-2">Edit</a>
-                        <a href="@Url.Action("Index", "Progress")" class="btn btn-secondary">Back</a>
-                        <a href="@Url.Action("Delete", "Progress", new { id = Model.ProgressId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        @if (ViewData["UserRole"]?.ToString() == "SiteEngineer")
+                        {
+                            <a href="@Url.Action("Edit", "Progress", new { id = Model.ProgressId })" class="btn btn-warning me-2">Edit</a>
+                        }
+                        <a href="@Url.Action("Index", "Progress")" class="btn btn-secondary me-2">Back</a>
+                        @if (ViewData["UserRole"]?.ToString() == "SiteEngineer")
+                        {
+                            <form asp-action="Delete" asp-controller="Progress" asp-route-id="@Model.ProgressId" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        }
                     </div>
                 </div>
             </div>

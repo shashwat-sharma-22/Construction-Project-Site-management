@@ -19,6 +19,11 @@ namespace ConstructionProject.Repositories
             return _db.Projects.ToListAsync();
         }
 
+        public Task<List<Project>> GetAllWithContractorAsync()
+        {
+            return _db.Projects.Include(p => p.Contractor).ToListAsync();
+        }
+
         public Task AddAsync(Project project)
         {
             return _db.Projects.AddAsync(project).AsTask();
@@ -29,9 +34,19 @@ namespace ConstructionProject.Repositories
             return _db.Projects.FindAsync(id).AsTask();
         }
 
+        public Task<Project?> GetByIdWithContractorAsync(int id)
+        {
+            return _db.Projects.Include(p => p.Contractor).FirstOrDefaultAsync(p => p.ProjectId == id);
+        }
+
         public void Remove(Project project)
         {
             _db.Projects.Remove(project);
+        }
+
+        public IQueryable<Project> Query()
+        {
+            return _db.Projects.AsQueryable();
         }
 
         public Task SaveChangesAsync()

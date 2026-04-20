@@ -85,6 +85,15 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">🔗 Assign Contractor</h5>
+                        <p class="card-text">Assign contractors to projects</p>
+                        <a href="@Url.Action("AssignContractor", "Project")" class="btn btn-light btn-sm">Assign</a>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 
@@ -102,7 +111,7 @@
                         <h5 class="card-title">📊 Progress</h5>
                         <p class="card-text">Track project progress</p>
                         <a href="@Url.Action("Index", "Progress")" class="btn btn-light btn-sm">View All</a>
-                        @if (ViewBag.UserRole == "SiteEngineer" || ViewBag.UserRole == "Admin")
+                        @if (ViewBag.UserRole == "SiteEngineer")
                         {
                             <a href="@Url.Action("Create", "Progress")" class="btn btn-light btn-sm">+ Log</a>
                         }
@@ -158,6 +167,45 @@
     }
 
     <!-- ACCESS SUMMARY BASED ON ROLE -->
+
+    <!-- CONTRACTOR - Can view assigned projects and manage workforce -->
+    @if (ViewBag.UserRole == "Contractor")
+    {
+        <div class="alert alert-info mb-4">
+            <strong>📋 My Assigned Projects</strong>
+            <p class="mb-0">View projects you are assigned to and manage your workforce</p>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 My Projects</h5>
+                        <p class="card-text">View your assigned projects & tasks</p>
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-light btn-sm">View All</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">👥 My Workforce</h5>
+                        <p class="card-text">Add & manage your workers</p>
+                        <a href="@Url.Action("Workforce", "Contractor")" class="btn btn-light btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Progress</h5>
+                        <p class="card-text">View your project progress</p>
+                        <a href="@Url.Action("Index", "Progress")" class="btn btn-light btn-sm">View All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <div class="card mt-5">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">Your Access Level: @ViewBag.UserRole</h5>
@@ -221,11 +269,13 @@
                 <div class="alert alert-info">
                     <strong>✓ Contractor Access</strong>
                     <ul class="mb-0 mt-2">
-                        <li>✓ View assigned projects</li>
-                        <li>✓ View progress on assigned projects</li>
-                        <li>✓ Access contractor specific data</li>
-                        <li>✗ Cannot create projects</li>
-                        <li>✗ Cannot modify other data</li>
+                        <li>✓ View assigned projects only</li>
+                        <li>✓ Add workforce to your contractor profile</li>
+                        <li>✓ Assign workforce members to tasks</li>
+                        <li>✓ View progress on your assigned projects</li>
+                        <li>✗ Cannot create or edit projects</li>
+                        <li>✗ Cannot view other contractors</li>
+                        <li>✗ Cannot create or delete tasks</li>
                     </ul>
                 </div>
             }
