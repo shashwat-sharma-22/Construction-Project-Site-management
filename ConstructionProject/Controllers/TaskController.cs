@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using ConstructionProject.Models;
 using ConstructionProject.Interfaces;
-using ConstructionProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -25,11 +24,20 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Index(int projectId, string? search)
         {
             var project = await _projectService.GetProjectDetailsAsync(projectId);
-            if (project == null) return NotFound();
+            if (project == null)
+            {
+                return NotFound();
+            }
 
-            var tasks = string.IsNullOrWhiteSpace(search)
-                ? await _taskService.GetTasksByProjectAsync(projectId)
-                : await _taskService.SearchTasksAsync(projectId, search.Trim());
+            List<ProjectTask> tasks;
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                tasks = (await _taskService.GetTasksByProjectAsync(projectId)).ToList();
+            }
+            else
+            {
+                tasks = (await _taskService.SearchTasksAsync(projectId, search.Trim())).ToList();
+            }
 
             ViewData["CurrentSearch"] = search;
             ViewData["ProjectId"] = projectId;
@@ -42,7 +50,10 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var task = await _taskService.GetTaskByIdAsync(id);
-            if (task == null) return NotFound();
+            if (task == null)
+            {
+                return NotFound();
+            }
             ViewData["UserRole"] = GetUserRole();
             return View(task);
         }
@@ -51,7 +62,10 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Create(int projectId)
         {
             var project = await _projectService.GetProjectDetailsAsync(projectId);
-            if (project == null) return NotFound();
+            if (project == null)
+            {
+                return NotFound();
+            }
 
             ViewData["ProjectId"] = projectId;
             ViewData["ProjectName"] = project.ProjectName;
@@ -68,7 +82,7 @@ namespace ConstructionProject.Controllers
             if (ModelState.IsValid)
             {
                 var created = await _taskService.CreateTaskAsync(task);
-                return RedirectToAction(nameof(Index), new { projectId });
+                return RedirectToAction("Index", new { projectId });
             }
 
             var project = await _projectService.GetProjectDetailsAsync(projectId);
@@ -83,7 +97,10 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var task = await _taskService.GetTaskByIdAsync(id);
-            if (task == null) return NotFound();
+            if (task == null)
+            {
+                return NotFound();
+            }
 
             ViewData["ProjectId"] = task.ProjectId;
             ViewData["UserRole"] = GetUserRole();
@@ -95,13 +112,19 @@ namespace ConstructionProject.Controllers
         [HttpPost("edit/{id}")]
         public async Task<IActionResult> Edit(int id, [FromForm] ProjectTask task)
         {
-            if (id != task.TaskId) return BadRequest();
+            if (id != task.TaskId)
+            {
+                return BadRequest();
+            }
 
             if (ModelState.IsValid)
             {
                 var ok = await _taskService.UpdateTaskAsync(id, task);
-                if (!ok) return NotFound();
-                return RedirectToAction(nameof(Index), new { projectId = task.ProjectId });
+                if (!ok)
+                {
+                    return NotFound();
+                }
+                return RedirectToAction("Index", new { projectId = task.ProjectId });
             }
 
             ViewData["ProjectId"] = task.ProjectId;
@@ -115,29 +138,44 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var task = await _taskService.GetTaskByIdAsync(id);
-            if (task == null) return NotFound();
+            if (task == null)
+            {
+                return NotFound();
+            }
 
             var projectId = task.ProjectId;
             await _taskService.DeleteTaskAsync(id);
-            return RedirectToAction(nameof(Index), new { projectId });
+            return RedirectToAction("Index", new { projectId });
         }
 
         private async System.Threading.Tasks.Task PopulateWorkforceDropdown(Project? project, int? selectedWorkerId = null)
         {
-            if (project?.ContractorId != null)
+            if (project != null && project.ContractorId != null)
             {
                 var workforce = await _contractorService.GetWorkforceByContractorAsync(project.ContractorId.Value);
                 ViewBag.Workforce = new SelectList(workforce, "WorkerId", "Name", selectedWorkerId);
             }
             else
             {
-                ViewBag.Workforce = new SelectList(Enumerable.Empty<Workforce>(), "WorkerId", "Name");
+                ViewBag.Workforce = new SelectList(new List<Workforce>(), "WorkerId", "Name");
             }
         }
 
         private string GetUserRole()
         {
-            return User.FindFirst("role")?.Value ?? Request.Cookies["userRole"] ?? "User";
+            var roleClaim = User.FindFirst("role");
+            if (roleClaim != null)
+            {
+                return roleClaim.Value;
+            }
+
+            var roleCookie = Request.Cookies["userRole"];
+            if (roleCookie != null)
+            {
+                return roleCookie;
+            }
+
+            return "User";
         }
     }
 }

@@ -60,7 +60,7 @@ namespace ConstructionProject.Controllers
                 await _service.AddMaterialAsync(material);
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
     }
 }

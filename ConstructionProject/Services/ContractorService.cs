@@ -108,7 +108,6 @@ namespace ConstructionProject.Services
         public async Task<IEnumerable<Contractor>> GetAvailableContractorsAsync()
         {
             var allContractors = await _contractorRepository.GetAllWithWorkforcesAsync();
-            // Note: This is a simplified approach; ideally project data access would be in ProjectRepository
             return allContractors;
         }
 

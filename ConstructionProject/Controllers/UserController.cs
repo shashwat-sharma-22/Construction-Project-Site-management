@@ -20,7 +20,6 @@ namespace ConstructionProject.Controllers
             _contractorService = contractorService;
         }
 
-        // POST api/user/login  — Public (no auth required)
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
@@ -45,7 +44,11 @@ namespace ConstructionProject.Controllers
             return Ok(response);
         }
 
+<<<<<<< HEAD
         [HttpGet("create")]
+=======
+        [HttpPost("register")]
+>>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
@@ -82,7 +85,6 @@ namespace ConstructionProject.Controllers
             return Ok(user);
         }
 
-        // GET api/user  — Admin only
         [HttpGet("")]
         [HttpGet("index")]
         [Authorize(Roles = "Admin")]
@@ -92,7 +94,6 @@ namespace ConstructionProject.Controllers
             return View(users);
         }
 
-        // GET api/user/5  — Admin only
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
@@ -103,7 +104,10 @@ namespace ConstructionProject.Controllers
             return View(user);
         }
 
+<<<<<<< HEAD
         // GET api/user/role/SiteEngineer  — Admin only
+=======
+>>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
         [HttpGet("role/{role}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByRole(UserRole role)
@@ -112,7 +116,10 @@ namespace ConstructionProject.Controllers
             return View(users);
         }
 
+<<<<<<< HEAD
         // GET api/user/edit/5  — Admin only
+=======
+>>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
         [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
@@ -134,7 +141,6 @@ namespace ConstructionProject.Controllers
             return Ok(user);
         }
 
-        // PUT api/user/5/deactivate  — Admin only
         [HttpPut("{id}/deactivate")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Deactivate(int id)
@@ -145,7 +151,6 @@ namespace ConstructionProject.Controllers
             return RedirectToAction("Index");
         }
 
-        // PUT api/user/5/activate  — Admin only
         [HttpPut("{id}/activate")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Activate(int id)
@@ -156,7 +161,6 @@ namespace ConstructionProject.Controllers
             return RedirectToAction("Index");
         }
 
-        // DELETE api/user/5  — Admin only
         [HttpPost("delete/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
