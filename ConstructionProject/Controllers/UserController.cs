@@ -11,11 +11,13 @@ namespace ConstructionProject.Controllers
     {
         private readonly IUserService _service;
         private readonly IJwtTokenService _tokenService;
+        private readonly IContractorService _contractorService;
 
-        public UserController(IUserService service, IJwtTokenService tokenService)
+        public UserController(IUserService service, IJwtTokenService tokenService, IContractorService contractorService)
         {
             _service = service;
             _tokenService = tokenService;
+            _contractorService = contractorService;
         }
 
         // POST api/user/login  — Public (no auth required)
@@ -63,6 +65,20 @@ namespace ConstructionProject.Controllers
             if (user == null)
                 return Conflict(new { message = "Email already exists." });
 
+            if (dto.Role == UserRole.Contractor && !string.IsNullOrWhiteSpace(dto.Email))
+            {
+                var existingContractor = await _contractorService.GetContractorByEmailAsync(dto.Email);
+                if (existingContractor == null)
+                {
+                    await _contractorService.AddContractorAsync(new Contractor
+                    {
+                        ContractorName = dto.Name,
+                        ContactInfo = dto.Email,
+                        Specialization = "General"
+                    });
+                }
+            }
+
             return Ok(user);
         }
 
@@ -87,9 +103,9 @@ namespace ConstructionProject.Controllers
             return View(user);
         }
 
-        // GET api/user/role/SiteEngineer  — Admin, ProjectManager
+        // GET api/user/role/SiteEngineer  — Admin only
         [HttpGet("role/{role}")]
-        [Authorize(Roles = "Admin,ProjectManager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByRole(UserRole role)
         {
             var users = await _service.GetUsersByRole(role);

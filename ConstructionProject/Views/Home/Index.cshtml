@@ -64,8 +64,8 @@
         </div>
     }
 
-    <!-- ADMIN & PROJECT MANAGER - Can manage contractors -->
-    @if (ViewBag.UserRole == "Admin" || ViewBag.UserRole == "ProjectManager")
+    <!-- ADMIN - Can manage contractors -->
+    @if (ViewBag.UserRole == "Admin")
     {
         <div class="alert alert-warning mb-4">
             <strong>👷 Contractor Management Section</strong>
@@ -78,10 +78,6 @@
                         <h5 class="card-title">👷 Contractors</h5>
                         <p class="card-text">Manage contractors & workforce</p>
                         <a href="@Url.Action("Index", "Contractor")" class="btn btn-light btn-sm">View All</a>
-                        @if (ViewBag.UserRole == "ProjectManager" || ViewBag.UserRole == "Admin")
-                        {
-                            <a href="@Url.Action("Create", "Contractor")" class="btn btn-light btn-sm">+ New</a>
-                        }
                     </div>
                 </div>
             </div>

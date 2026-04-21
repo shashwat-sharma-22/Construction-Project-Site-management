@@ -94,6 +94,7 @@ namespace ConstructionProject.Services
             var contractor = await _contractorRepository.GetByIdAsync(id);
             if (contractor == null) return false;
 
+            await _contractorRepository.ClearContractorFromProjectsAsync(id);
             _contractorRepository.Remove(contractor);
             await _contractorRepository.SaveChangesAsync();
             return true;

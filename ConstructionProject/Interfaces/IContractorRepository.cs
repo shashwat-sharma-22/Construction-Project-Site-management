@@ -16,6 +16,7 @@ namespace ConstructionProject.Interfaces
         Task<Workforce?> GetWorkerAsync(int workerId, int contractorId);
         void RemoveWorker(Workforce worker);
         Task<List<Workforce>> GetWorkforceByContractorAsync(int contractorId);
+        Task ClearContractorFromProjectsAsync(int contractorId);
         Task SaveChangesAsync();
     }
 }
