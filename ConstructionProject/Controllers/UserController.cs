@@ -44,11 +44,7 @@ namespace ConstructionProject.Controllers
             return Ok(response);
         }
 
-<<<<<<< HEAD
         [HttpGet("create")]
-=======
-        [HttpPost("register")]
->>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
@@ -104,10 +100,6 @@ namespace ConstructionProject.Controllers
             return View(user);
         }
 
-<<<<<<< HEAD
-        // GET api/user/role/SiteEngineer  — Admin only
-=======
->>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
         [HttpGet("role/{role}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByRole(UserRole role)
@@ -116,10 +108,6 @@ namespace ConstructionProject.Controllers
             return View(users);
         }
 
-<<<<<<< HEAD
-        // GET api/user/edit/5  — Admin only
-=======
->>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
         [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)

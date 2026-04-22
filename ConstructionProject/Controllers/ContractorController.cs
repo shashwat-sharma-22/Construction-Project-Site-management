@@ -85,7 +85,6 @@ namespace ConstructionProject.Controllers
             if (ModelState.IsValid)
             {
                 var created = await _service.AddContractorAsync(contractor);
-<<<<<<< HEAD
 
                 if (!string.IsNullOrWhiteSpace(contractor.ContactInfo))
                 {
@@ -111,9 +110,7 @@ namespace ConstructionProject.Controllers
                 }
 
                 return RedirectToAction(nameof(Details), new { id = created.ContractorId });
-=======
-                return RedirectToAction("Details", new { id = created.ContractorId });
->>>>>>> d7d5705477dedea1a66915168bbb15c8f9d75615
+
             }
             return View(contractor);
         }
