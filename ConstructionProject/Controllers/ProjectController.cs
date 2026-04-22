@@ -21,7 +21,7 @@ namespace ConstructionProject.Controllers
 
         [HttpGet("")]
         [HttpGet("index")]
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index()
         {
             var userRole = GetUserRole();
             ViewData["UserRole"] = userRole;
@@ -36,28 +36,13 @@ namespace ConstructionProject.Controllers
                     return View(new List<Project>());
                 }
 
-                if (string.IsNullOrWhiteSpace(search))
-                {
-                    projects = (await _service.GetProjectsByContractorAsync(contractor.ContractorId)).ToList();
-                }
-                else
-                {
-                    projects = (await _service.SearchProjectsByContractorAsync(contractor.ContractorId, search.Trim())).ToList();
-                }
+                projects = (await _service.GetProjectsByContractorAsync(contractor.ContractorId)).ToList();
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(search))
-                {
-                    projects = (await _service.GetAllProjectsAsync()).ToList();
-                }
-                else
-                {
-                    projects = (await _service.SearchProjectsAsync(search.Trim())).ToList();
-                }
+                projects = (await _service.GetAllProjectsAsync()).ToList();
             }
 
-            ViewData["CurrentSearch"] = search;
             return View(projects);
         }
 
@@ -157,7 +142,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("assign-contractor")]
-        public async Task<IActionResult> AssignContractor(string? search)
+        public async Task<IActionResult> AssignContractor()
         {
             var userRole = GetUserRole();
             if (userRole != "Admin" && userRole != "ProjectManager")
@@ -165,20 +150,11 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewData["CurrentSearch"] = search;
             ViewBag.Contractors = new SelectList(
                 await _contractorService.GetAllContractorsAsync(),
                 "ContractorId", "ContractorName");
 
-            List<Project> projects;
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                projects = (await _service.SearchProjectsAsync(search.Trim())).ToList();
-            }
-            else
-            {
-                projects = (await _service.GetAllProjectsAsync()).ToList();
-            }
+            var projects = (await _service.GetAllProjectsAsync()).ToList();
 
             return View(projects);
         }

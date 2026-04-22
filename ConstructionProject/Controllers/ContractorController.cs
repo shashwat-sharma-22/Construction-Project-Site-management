@@ -22,7 +22,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index()
         {
             var userRole = GetUserRole();
             if (userRole == "Contractor")
@@ -30,17 +30,8 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            List<Contractor> contractors;
-            if (string.IsNullOrWhiteSpace(search))
-            {
-                contractors = (await _service.GetAllContractorsAsync()).ToList();
-            }
-            else
-            {
-                contractors = (await _service.SearchContractorsAsync(search.Trim())).ToList();
-            }
+            var contractors = (await _service.GetAllContractorsAsync()).ToList();
 
-            ViewData["CurrentSearch"] = search;
             return View(contractors);
         }
 
@@ -176,7 +167,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("workforce")]
-        public async Task<IActionResult> Workforce(string? search)
+        public async Task<IActionResult> Workforce()
         {
             var userRole = GetUserRole();
             if (userRole != "Contractor")
@@ -191,13 +182,6 @@ namespace ConstructionProject.Controllers
                 return View(new Contractor());
             }
 
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                var filtered = await _service.SearchWorkforceAsync(contractor.ContractorId, search.Trim());
-                contractor.Workforces = filtered.ToList();
-            }
-
-            ViewData["CurrentSearch"] = search;
             return View(contractor);
         }
 

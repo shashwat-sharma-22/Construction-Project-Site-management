@@ -21,7 +21,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("project/{projectId}")]
-        public async Task<IActionResult> Index(int projectId, string? search)
+        public async Task<IActionResult> Index(int projectId)
         {
             var project = await _projectService.GetProjectDetailsAsync(projectId);
             if (project == null)
@@ -29,17 +29,8 @@ namespace ConstructionProject.Controllers
                 return NotFound();
             }
 
-            List<ProjectTask> tasks;
-            if (string.IsNullOrWhiteSpace(search))
-            {
-                tasks = (await _taskService.GetTasksByProjectAsync(projectId)).ToList();
-            }
-            else
-            {
-                tasks = (await _taskService.SearchTasksAsync(projectId, search.Trim())).ToList();
-            }
+            var tasks = (await _taskService.GetTasksByProjectAsync(projectId)).ToList();
 
-            ViewData["CurrentSearch"] = search;
             ViewData["ProjectId"] = projectId;
             ViewData["ProjectName"] = project.ProjectName;
             ViewData["UserRole"] = GetUserRole();
