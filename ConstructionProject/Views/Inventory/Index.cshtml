@@ -1,4 +1,4 @@
-@model IEnumerable<dynamic>
+@model ConstructionProject.Models.InventoryIndexViewModel
 
 @{
     ViewData["Title"] = "Inventory";
@@ -31,29 +31,30 @@
                 <table class="table table-hover table-striped">
                     <thead class="table-dark">
                         <tr>
-                            <th>Equipment Name</th>
+                            <th>EquipmentId</th>
+                            <th>Name</th>
                             <th>Status</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     
                     <tbody>
-                        @foreach (var item in ViewBag.Equipment)
+                    @if (Model.Equipments != null && Model.Equipments.Count > 0)
+                    {
+                        foreach (var equipment in Model.Equipments)
                         {
                             <tr>
-                                <td>@item.Name</td>
-                                <td>@item.Status</td>
+                                <td>@equipment.EquipmentId</td>
+                                <td>@equipment.Name</td>
+                                <td>@equipment.Status</td>
                             </tr>
                         }
+                    }
+                    else
+                    {
                         <tr>
-                            <td>Sample Equipment</td>
-                            <td><span class="badge bg-success">AVAILABLE</span></td>
-                            <td>
-                                <a href="#" class="btn btn-info btn-sm">View</a>
-                                <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm">Delete</a>
-                            </td>
+                            <td colspan="3" class="text-center">No equipment found.</td>
                         </tr>
+                    }
                     </tbody>
                 </table>
             </div>
@@ -64,23 +65,31 @@
                 <table class="table table-hover table-striped">
                     <thead class="table-dark">
                         <tr>
-                            <th>Material Name</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                            <th>Actions</th>
+                            <th>MaterialId</th>
+                            <th>Name</th>
+                            <th>QuantityAvailable</th>
+                            <th>UnitCost</th>
                         </tr>
                     </thead>
                     <tbody>
+                    @if (Model.Materials != null && Model.Materials.Count > 0)
+                    {
+                        foreach (var material in Model.Materials)
+                        {
+                            <tr>
+                                <td>@material.MaterialId</td>
+                                <td>@material.Name</td>
+                                <td>@material.QuantityAvailable</td>
+                                <td>@material.UnitCost</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <td>Sample Material</td>
-                            <td>100</td>
-                            <td>Units</td>
-                            <td>
-                                <a href="#" class="btn btn-info btn-sm">View</a>
-                                <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm">Delete</a>
-                            </td>
+                            <td colspan="4" class="text-center">No materials found.</td>
                         </tr>
+                    }
                     </tbody>
                 </table>
             </div>

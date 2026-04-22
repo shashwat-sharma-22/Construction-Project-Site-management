@@ -79,5 +79,12 @@ namespace ConstructionProject.Controllers
             }
             return View(new ErrorViewModel { RequestId = requestId });
         }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult NotFound()
+        {
+            ViewData["RequestPath"] = Request.Path;
+            return View();
+        }
     }
 }

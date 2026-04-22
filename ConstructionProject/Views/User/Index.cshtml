@@ -10,7 +10,7 @@
             <h1>Users</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="@Url.Action("register", "User")" class="btn btn-primary">
+            <a href="@Url.Action("Create", "User")" class="btn btn-primary">
                 <i class="bi bi-plus"></i> New User
             </a>
         </div>
@@ -39,7 +39,7 @@
                             <td>@(user.IsActive ? "Yes" : "No")</td>
                             <td>
                                 <a href="@Url.Action("Details", "User", new { id = user.UserId })" class="btn btn-info btn-sm">View</a>
-                                @* <a href="@Url.Action("UpdateRole", "User", new { id = user.UserId })" class="btn btn-warning btn-sm">Update Role</a> *@
+                                <a href="@Url.Action("Edit", "User", new { id = user.UserId })" class="btn btn-warning btn-sm">Edit</a>
                                 <form asp-action="Delete" asp-controller="User" asp-route-id="@user.UserId" method="post" style="display: inline;">
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?)">
                                         Delete

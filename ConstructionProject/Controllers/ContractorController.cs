@@ -1,6 +1,10 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
+using ConstructionProject.DTOs;
 using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConstructionProject.Controllers
@@ -9,10 +13,12 @@ namespace ConstructionProject.Controllers
     public class ContractorController : Controller
     {
         private readonly IContractorService _service;
+        private readonly IUserService _userService;
 
-        public ContractorController(IContractorService service)
+        public ContractorController(IContractorService service, IUserService userService)
         {
             _service = service;
+            _userService = userService;
         }
 
         [HttpGet("")]
@@ -56,6 +62,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("create")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             if (GetUserRole() == "Contractor")
@@ -67,6 +74,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromForm] Contractor contractor)
         {
             if (GetUserRole() == "Contractor")
@@ -77,12 +85,38 @@ namespace ConstructionProject.Controllers
             if (ModelState.IsValid)
             {
                 var created = await _service.AddContractorAsync(contractor);
-                return RedirectToAction("Details", new { id = created.ContractorId });
+
+                if (!string.IsNullOrWhiteSpace(contractor.ContactInfo))
+                {
+                    var existingUsers = await _userService.GetAllUsers();
+                    var existingUser = existingUsers.FirstOrDefault(u =>
+                        !string.IsNullOrWhiteSpace(u.Email) &&
+                        string.Equals(u.Email, contractor.ContactInfo, StringComparison.OrdinalIgnoreCase));
+
+                    if (existingUser == null)
+                    {
+                        await _userService.RegisterUser(new RegisterUserDto
+                        {
+                            Name = contractor.ContractorName,
+                            Email = contractor.ContactInfo,
+                            Password = "Contractor@123",
+                            Role = UserRole.Contractor
+                        });
+                    }
+                    else if (!string.Equals(existingUser.Role, UserRole.Contractor.ToString(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        await _userService.UpdateRole(existingUser.UserId, UserRole.Contractor);
+                    }
+                }
+
+                return RedirectToAction(nameof(Details), new { id = created.ContractorId });
+
             }
             return View(contractor);
         }
 
         [HttpGet("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             if (GetUserRole() == "Contractor")
@@ -99,6 +133,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpPost("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [FromForm] Contractor contractor)
         {
             if (GetUserRole() == "Contractor")
@@ -124,6 +159,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpPost("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (GetUserRole() == "Contractor")

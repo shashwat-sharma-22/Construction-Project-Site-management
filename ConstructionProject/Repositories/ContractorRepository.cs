@@ -81,6 +81,18 @@ namespace ConstructionProject.Repositories
                 .ToListAsync();
         }
 
+        public async Task ClearContractorFromProjectsAsync(int contractorId)
+        {
+            var projects = await _db.Projects
+                .Where(p => p.ContractorId == contractorId)
+                .ToListAsync();
+
+            foreach (var project in projects)
+            {
+                project.ContractorId = null;
+            }
+        }
+
         public Task SaveChangesAsync()
         {
             return _db.SaveChangesAsync();

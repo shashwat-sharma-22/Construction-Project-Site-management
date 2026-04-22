@@ -11,11 +11,13 @@ namespace ConstructionProject.Controllers
     {
         private readonly IUserService _service;
         private readonly IJwtTokenService _tokenService;
+        private readonly IContractorService _contractorService;
 
-        public UserController(IUserService service, IJwtTokenService tokenService)
+        public UserController(IUserService service, IJwtTokenService tokenService, IContractorService contractorService)
         {
             _service = service;
             _tokenService = tokenService;
+            _contractorService = contractorService;
         }
 
         [HttpPost("login")]
@@ -42,9 +44,17 @@ namespace ConstructionProject.Controllers
             return Ok(response);
         }
 
-        [HttpPost("register")]
+        [HttpGet("create")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST api/user/register  — Admin only
+        [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([FromBody] RegisterUserDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -54,7 +64,21 @@ namespace ConstructionProject.Controllers
             if (user == null)
                 return Conflict(new { message = "Email already exists." });
 
-            return View(user);
+            if (dto.Role == UserRole.Contractor && !string.IsNullOrWhiteSpace(dto.Email))
+            {
+                var existingContractor = await _contractorService.GetContractorByEmailAsync(dto.Email);
+                if (existingContractor == null)
+                {
+                    await _contractorService.AddContractorAsync(new Contractor
+                    {
+                        ContractorName = dto.Name,
+                        ContactInfo = dto.Email,
+                        Specialization = "General"
+                    });
+                }
+            }
+
+            return Ok(user);
         }
 
         [HttpGet("")]
@@ -77,7 +101,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("role/{role}")]
-        [Authorize(Roles = "Admin,ProjectManager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByRole(UserRole role)
         {
             var users = await _service.GetUsersByRole(role);
@@ -86,13 +110,23 @@ namespace ConstructionProject.Controllers
 
         [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateRole(int id,
-                                                    [FromBody] UpdateRoleDto dto)
+        public async Task<IActionResult> Edit(int id)
+        {
+            var user = await _service.GetUserById(id);
+            if (user == null)
+                return NotFound(new { message = $"User {id} not found." });
+            return View(user);
+        }
+
+        // PUT api/user/5/role  — Admin only
+        [HttpPut("{id}/role")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleDto dto)
         {
             var user = await _service.UpdateRole(id, dto.NewRole);
             if (user == null)
                 return NotFound(new { message = $"User {id} not found." });
-            return View(user);
+            return Ok(user);
         }
 
         [HttpPut("{id}/deactivate")]
