@@ -66,9 +66,10 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Contractors = new SelectList(
-                await _contractorService.GetAllContractorsAsync(),
-                "ContractorId", "ContractorName");
+            var allContractors = (await _contractorService.GetAllContractorsAsync()).ToList();
+            var availableContractors = allContractors.Where(c => c.IsAssigned == false).ToList();
+
+            ViewBag.Contractors = new SelectList(availableContractors, "ContractorId", "ContractorName");
             return View(new Project { startDate = DateTime.Today, endDate = DateTime.Today });
         }
 
@@ -86,9 +87,10 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Details", new { id = created.ProjectId });
             }
 
-            ViewBag.Contractors = new SelectList(
-                await _contractorService.GetAllContractorsAsync(),
-                "ContractorId", "ContractorName");
+            var allContractorsForError = (await _contractorService.GetAllContractorsAsync()).ToList();
+            var availableContractorsForError = allContractorsForError.Where(c => c.IsAssigned == false).ToList();
+
+            ViewBag.Contractors = new SelectList(availableContractorsForError, "ContractorId", "ContractorName");
             return View(project);
         }
 
@@ -106,9 +108,10 @@ namespace ConstructionProject.Controllers
                 return NotFound();
             }
 
-            ViewBag.Contractors = new SelectList(
-                await _contractorService.GetAllContractorsAsync(),
-                "ContractorId", "ContractorName", project.ContractorId);
+            var allContractorsForEdit = (await _contractorService.GetAllContractorsAsync()).ToList();
+            var availableContractorsForEdit = allContractorsForEdit.Where(c => c.IsAssigned == false || c.ContractorId == project.ContractorId).ToList();
+
+            ViewBag.Contractors = new SelectList(availableContractorsForEdit, "ContractorId", "ContractorName", project.ContractorId);
             return View(project);
         }
 
@@ -135,9 +138,10 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Contractors = new SelectList(
-                await _contractorService.GetAllContractorsAsync(),
-                "ContractorId", "ContractorName", project.ContractorId);
+            var allContractorsForEditError = (await _contractorService.GetAllContractorsAsync()).ToList();
+            var availableContractorsForEditError = allContractorsForEditError.Where(c => c.IsAssigned == false || c.ContractorId == project.ContractorId).ToList();
+
+            ViewBag.Contractors = new SelectList(availableContractorsForEditError, "ContractorId", "ContractorName", project.ContractorId);
             return View(project);
         }
 
@@ -150,9 +154,8 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Contractors = new SelectList(
-                await _contractorService.GetAllContractorsAsync(),
-                "ContractorId", "ContractorName");
+            var allContractors = (await _contractorService.GetAllContractorsAsync()).ToList();
+            ViewBag.AllContractors = allContractors;
 
             var projects = (await _service.GetAllProjectsAsync()).ToList();
 
@@ -172,6 +175,16 @@ namespace ConstructionProject.Controllers
             if (project == null)
             {
                 return NotFound();
+            }
+
+            if (contractorId.HasValue)
+            {
+                var contractor = await _contractorService.GetContractorDetailsAsync(contractorId.Value);
+                if (contractor != null && contractor.IsAssigned && project.ContractorId != contractorId.Value)
+                {
+                    TempData["ErrorMessage"] = "This contractor is already assigned to another project.";
+                    return RedirectToAction("AssignContractor");
+                }
             }
 
             project.ContractorId = contractorId;
@@ -219,7 +232,7 @@ namespace ConstructionProject.Controllers
                 return roleCookie;
             }
 
-            return "User";
+            return "";
         }
 
         private string GetUserEmail()

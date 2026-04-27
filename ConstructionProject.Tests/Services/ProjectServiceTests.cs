@@ -10,13 +10,15 @@ namespace ConstructionProject.Tests.Services
     public class ProjectServiceTests
     {
         private Mock<IProjectRepository> _mockRepo = null!;
+        private Mock<IContractorRepository> _mockContractorRepo = null!;
         private ProjectService _service = null!;
 
         [SetUp]
         public void Setup()
         {
             _mockRepo = new Mock<IProjectRepository>();
-            _service = new ProjectService(_mockRepo.Object);
+            _mockContractorRepo = new Mock<IContractorRepository>();
+            _service = new ProjectService(_mockRepo.Object, _mockContractorRepo.Object);
         }
 
         [Test]

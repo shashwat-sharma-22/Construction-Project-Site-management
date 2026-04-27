@@ -10,10 +10,12 @@ namespace ConstructionProject.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly IContractorRepository _contractorRepository;
 
-        public ProjectService(IProjectRepository projectRepository)
+        public ProjectService(IProjectRepository projectRepository, IContractorRepository contractorRepository)
         {
             _projectRepository = projectRepository;
+            _contractorRepository = contractorRepository;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
@@ -68,6 +70,17 @@ namespace ConstructionProject.Services
         {
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
+
+            if (project.ContractorId.HasValue)
+            {
+                var contractor = await _contractorRepository.GetByIdAsync(project.ContractorId.Value);
+                if (contractor != null)
+                {
+                    contractor.IsAssigned = true;
+                    await _contractorRepository.SaveChangesAsync();
+                }
+            }
+
             return project;
         }
 
@@ -79,7 +92,13 @@ namespace ConstructionProject.Services
         public async Task<bool> UpdateProjectPlanAsync(int id, Project updated)
         {
             var existing = await _projectRepository.GetByIdAsync(id);
-            if (existing == null) return false;
+            if (existing == null)
+            {
+                return false;
+            }
+
+            int? oldContractorId = existing.ContractorId;
+            int? newContractorId = updated.ContractorId;
 
             existing.ProjectName = updated.ProjectName;
             existing.startDate = updated.startDate;
@@ -88,16 +107,56 @@ namespace ConstructionProject.Services
             existing.ContractorId = updated.ContractorId;
 
             await _projectRepository.SaveChangesAsync();
+
+            if (oldContractorId != newContractorId)
+            {
+                if (oldContractorId.HasValue)
+                {
+                    var oldContractor = await _contractorRepository.GetByIdAsync(oldContractorId.Value);
+                    if (oldContractor != null)
+                    {
+                        oldContractor.IsAssigned = false;
+                        await _contractorRepository.SaveChangesAsync();
+                    }
+                }
+
+                if (newContractorId.HasValue)
+                {
+                    var newContractor = await _contractorRepository.GetByIdAsync(newContractorId.Value);
+                    if (newContractor != null)
+                    {
+                        newContractor.IsAssigned = true;
+                        await _contractorRepository.SaveChangesAsync();
+                    }
+                }
+            }
+
             return true;
         }
 
         public async Task<bool> DeleteProjectAsync(int id)
         {
             var project = await _projectRepository.GetByIdAsync(id);
-            if (project == null) return false;
+            if (project == null)
+            {
+                return false;
+            }
+
+            int? contractorId = project.ContractorId;
 
             _projectRepository.Remove(project);
             await _projectRepository.SaveChangesAsync();
+
+            if (contractorId.HasValue)
+            {
+                var contractor = await _contractorRepository.GetByIdAsync(contractorId.Value);
+                if (contractor != null)
+                {
+                    contractor.IsAssigned = false;
+                    await _contractorRepository.SaveChangesAsync();
+                }
+            }
+
             return true;
         }
     }
