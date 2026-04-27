@@ -57,7 +57,25 @@ namespace ConstructionProject.Controllers
             {
                 return NotFound();
             }
-            ViewData["UserRole"] = GetUserRole();
+
+            var userRole = GetUserRole();
+            if (userRole == "Contractor")
+            {
+                var contractor = await GetCurrentContractorAsync();
+                if (contractor == null)
+                {
+                    return Forbid();
+                }
+
+                var projects = await _projectService.GetProjectsByContractorAsync(contractor.ContractorId);
+                var isAssignedToProject = projects.Any(p => p.ProjectId == progress.ProjectId);
+                if (!isAssignedToProject)
+                {
+                    return Forbid();
+                }
+            }
+
+            ViewData["UserRole"] = userRole;
             return View(progress);
         }
 
