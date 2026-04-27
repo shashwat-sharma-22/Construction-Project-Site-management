@@ -29,7 +29,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Users</h5>
                         <p class="card-text">Manage User</p>
-                        <a href="@Url.Action("Index", "User")" class="btn btn-light btn-sm">View Users</a>
+                        <a href="@Url.Action("Index", "User")" class="btn btn-light btn-sm mb-2">View Users</a>
                         @if (ViewBag.UserRole == "Admin")
                         {
                             <a href="@Url.Action("Create", "User")" class="btn btn-light btn-sm">+ New</a>
@@ -53,7 +53,7 @@
                     <div class="card-body">
                         <h5 class="card-title">📋 Projects</h5>
                         <p class="card-text">Manage construction projects</p>
-                        <a href="@Url.Action("Index", "Project")" class="btn btn-light btn-sm">View All</a>
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-light btn-sm mb-2">View All</a>
                         @if (ViewBag.UserRole == "ProjectManager" || ViewBag.UserRole == "Admin")
                         {
                             <a href="@Url.Action("Create", "Project")" class="btn btn-light btn-sm">+ New</a>
@@ -94,7 +94,7 @@
     }
 
     <!-- ALL ROLES EXCEPT CONTRACTOR - Can view progress -->
-    @if (ViewBag.UserRole == "Contractor")
+    @if (ViewBag.UserRole != "Contractor")
     {
         <div class="alert alert-success mb-4">
             <strong>📊 Progress Tracking Section</strong>
@@ -106,7 +106,7 @@
                     <div class="card-body">
                         <h5 class="card-title">📊 Progress</h5>
                         <p class="card-text">Track project progress</p>
-                        <a href="@Url.Action("Index", "Progress")" class="btn btn-light btn-sm">View All</a>
+                        <a href="@Url.Action("Index", "Progress")" class="btn btn-light btn-sm mb-2">View All</a>
                         @if (ViewBag.UserRole == "SiteEngineer")
                         {
                             <a href="@Url.Action("Create", "Progress")" class="btn btn-light btn-sm">+ Log</a>
@@ -130,7 +130,7 @@
                     <div class="card-body">
                         <h5 class="card-title">🔧 Inventory</h5>
                         <p class="card-text">Equipment & materials</p>
-                        <a href="@Url.Action("Index", "Inventory")" class="btn btn-light btn-sm">View All</a>
+                        <a href="@Url.Action("Index", "Inventory")" class="btn btn-light btn-sm mb-2">View All</a>
                         <a href="@Url.Action("Create", "Inventory")" class="btn btn-light btn-sm">+ Add</a>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                     <div class="card-body">
                         <h5 class="card-title">⚠️ Safety</h5>
                         <p class="card-text">Safety inspections</p>
-                        <a href="@Url.Action("Index", "Safety")" class="btn btn-light btn-sm">View All</a>
+                        <a href="@Url.Action("Index", "Safety")" class="btn btn-light btn-sm mb-2">View All</a>
                         @if (ViewBag.UserRole == "SafetyOfficer" || ViewBag.UserRole == "Admin")
                         {
                             <a href="@Url.Action("Create", "Safety")" class="btn btn-light btn-sm">+ New</a>
