@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ConstructionProject.Services
 {
-    public class JwtTokenService
+    public class JwtTokenService : IJwtTokenService
     {
         private readonly IConfiguration _configuration;
 

@@ -8,7 +8,7 @@
             <h1>➕ Add Inventory Item</h1>
             <hr />
 
-            <form asp-action="Create">
+            <form asp-action="Create" method="post">
                 <div class="form-group mb-3">
                     <label for="itemType" class="form-label">Item Type</label>
                     <select id="itemType" name="itemType" class="form-select" onchange="toggleItemType()">
@@ -21,12 +21,12 @@
                 <div id="equipmentFields" style="display: none;">
                     <div class="form-group mb-3">
                         <label for="equipmentName" class="form-label">Equipment Name</label>
-                        <input type="text" id="equipmentName" class="form-control" placeholder="Enter equipment name" />
+                        <input type="text" id="equipmentName" name="equipmentName" class="form-control" placeholder="Enter equipment name" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="status" class="form-label">Status</label>
-                        <select id="status" class="form-select">
+                        <select id="status" name="status" class="form-select">
                             <option value="AVAILABLE">Available</option>
                             <option value="IN_USE">In Use</option>
                             <option value="MAINTENANCE">Maintenance</option>
@@ -37,17 +37,22 @@
                 <div id="materialFields" style="display: none;">
                     <div class="form-group mb-3">
                         <label for="materialName" class="form-label">Material Name</label>
-                        <input type="text" id="materialName" class="form-control" placeholder="Enter material name" />
+                        <input type="text" id="materialName" name="materialName" class="form-control" placeholder="Enter material name" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" id="quantity" class="form-control" placeholder="0" />
+                        <input type="number" id="quantity" name="quantity" class="form-control" placeholder="0" min="0" step="0.01" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="unitCost" class="form-label">Unit Cost</label>
+                        <input type="number" id="unitCost" name="unitCost" class="form-control" placeholder="0.00" min="0" step="0.01" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="unit" class="form-label">Unit</label>
-                        <input type="text" id="unit" class="form-control" placeholder="e.g., kg, liter, meter" />
+                        <input type="text" id="unit" name="unit" class="form-control" placeholder="e.g., kg, liter, meter" />
                     </div>
                 </div>
 
@@ -61,9 +66,22 @@
 </div>
 
 <script>
+function setSectionEnabled(sectionId, enabled) {
+    const elements = document.querySelectorAll(`#${sectionId} input, #${sectionId} select, #${sectionId} textarea`);
+    elements.forEach(e => e.disabled = !enabled);
+}
+
 function toggleItemType() {
     const itemType = document.getElementById('itemType').value;
-    document.getElementById('equipmentFields').style.display = itemType === 'equipment' ? 'block' : 'none';
-    document.getElementById('materialFields').style.display = itemType === 'material' ? 'block' : 'none';
+    const isEquipment = itemType === 'equipment';
+    const isMaterial = itemType === 'material';
+
+    document.getElementById('equipmentFields').style.display = isEquipment ? 'block' : 'none';
+    document.getElementById('materialFields').style.display = isMaterial ? 'block' : 'none';
+
+    setSectionEnabled('equipmentFields', isEquipment);
+    setSectionEnabled('materialFields', isMaterial);
 }
+
+document.addEventListener('DOMContentLoaded', toggleItemType);
 </script>

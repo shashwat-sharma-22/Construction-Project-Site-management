@@ -1,0 +1,50 @@
+﻿@model ConstructionProject.DTOs.UserResponseDto
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">📋 @Model.Name</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">User ID:</label>
+                            <p>@Model.UserId</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email:</label>
+                            <p>@Model.Email</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Joinig Date:</label>
+                            <p>@Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Role:</label>
+                            <p>@Model.Role</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Is Active:</label>
+                            <p>@(Model.IsActive ? "Active" : "Not Active")</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        @* <a href="@Url.Action("Edit", "Project", new { id = Model.ProjectId })" class="btn btn-warning me-2">Edit</a> *@
+                        <a href="@Url.Action("Index", "User")" class="btn btn-secondary">Back</a>
+                        <a href="@Url.Action("Delete", "User", new { id = Model.UserId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

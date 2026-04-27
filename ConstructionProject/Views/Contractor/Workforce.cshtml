@@ -1,0 +1,91 @@
+@model ConstructionProject.Models.Contractor
+
+@{
+    ViewData["Title"] = "My Workforce";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>👥 My Workforce</h1>
+            @if (ViewData["NoContractor"] == null)
+            {
+                <p class="text-muted">Contractor: <strong>@Model.ContractorName</strong> | Specialization: @Model.Specialization</p>
+                <p class="text-muted small"><em>💡 You can add workers anytime. To assign them to tasks, you must be assigned to a project first.</em></p>
+            }
+        </div>
+        <div class="col-md-4 text-end">
+            @if (ViewData["NoContractor"] == null)
+            {
+                <a href="@Url.Action("AddWorker", "Contractor")" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Add Worker
+                </a>
+            }
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                🏠 Dashboard
+            </a>
+        </div>
+    </div>
+
+    @if (ViewData["NoContractor"] == null)
+    {
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <form method="get" asp-action="Workforce" asp-controller="Contractor" class="d-flex">
+                    <input type="text" name="search" value="@ViewData["CurrentSearch"]" class="form-control me-2" placeholder="Search by Worker ID or Name..." />
+                    <button type="submit" class="btn btn-outline-primary me-2">Search</button>
+                    <a href="@Url.Action("Workforce", "Contractor")" class="btn btn-outline-secondary">Clear</a>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (ViewData["NoContractor"] != null)
+    {
+        <div class="alert alert-warning text-center py-5">
+            <h5>No contractor profile found</h5>
+            <p>Your account is not linked to a contractor profile. Please contact an administrator.</p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">🏠 Back to Dashboard</a>
+        </div>
+    }
+    else if (Model.Workforces?.Any() == true)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var worker in Model.Workforces)
+                    {
+                        <tr>
+                            <td>@worker.WorkerId</td>
+                            <td><strong>@worker.Name</strong></td>
+                            <td>@worker.Role</td>
+                            <td>
+                                <form asp-action="RemoveWorker" asp-controller="Contractor" asp-route-id="@worker.WorkerId" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this worker?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <h5>No workers added yet</h5>
+            <p>Add your first workforce member to get started.</p>
+            <a href="@Url.Action("AddWorker", "Contractor")" class="btn btn-primary">Add Worker</a>
+        </div>
+    }
+</div>

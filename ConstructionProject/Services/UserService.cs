@@ -1,27 +1,26 @@
-﻿using ConstructionProject.Data;
-using ConstructionProject.DTOs;
+﻿using ConstructionProject.DTOs;
+using ConstructionProject.Interfaces;
 using ConstructionProject.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionProject.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(AppDbContext context)
+        public UserService(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
 
-        // ── Register a new user (Admin only) ─────────────────────────────────
         public async Task<UserResponseDto?> RegisterUser(RegisterUserDto dto)
         {
-            // Check if email already exists
-            var exists = await _context.Users
-                .AnyAsync(u => u.Email == dto.Email);
+            var exists = await _userRepository.EmailExistsAsync(dto.Email);
 
-            if (exists) return null;
+            if (exists)
+            {
+                return null;
+            }
 
             var user = new AppUser
             {
@@ -33,90 +32,102 @@ namespace ConstructionProject.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
 
             return MapToDto(user);
         }
 
-        // ── Get all users ─────────────────────────────────────────────────────
         public async Task<List<UserResponseDto>> GetAllUsers()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _userRepository.GetAllAsync();
             return users.Select(MapToDto).ToList();
         }
 
-        // ── Get users by role ─────────────────────────────────────────────────
         public async Task<List<UserResponseDto>> GetUsersByRole(UserRole role)
         {
-            var users = await _context.Users
-                .Where(u => u.Role == role && u.IsActive)
-                .ToListAsync();
+            var users = await _userRepository.GetActiveByRoleAsync(role);
             return users.Select(MapToDto).ToList();
         }
 
-        // ── Get single user ───────────────────────────────────────────────────
         public async Task<UserResponseDto?> GetUserById(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            return user == null ? null : MapToDto(user);
-        }
-
-        // ── Update role ───────────────────────────────────────────────────────
-        public async Task<UserResponseDto?> UpdateRole(int userId, UserRole newRole)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
-
-            user.Role = newRole;
-            await _context.SaveChangesAsync();
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
             return MapToDto(user);
         }
 
-        // ── Activate / Deactivate user ────────────────────────────────────────
+        public async Task<UserResponseDto?> UpdateRole(int userId, UserRole newRole)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Role = newRole;
+            await _userRepository.SaveChangesAsync();
+            return MapToDto(user);
+        }
+
         public async Task<bool> SetActiveStatus(int userId, bool isActive)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return false;
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
 
             user.IsActive = isActive;
-            await _context.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
             return true;
         }
 
-        // ── Delete user ───────────────────────────────────────────────────────
         public async Task<bool> DeleteUser(int userId)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return false;
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            _userRepository.Remove(user);
+            await _userRepository.SaveChangesAsync();
             return true;
         }
 
-        // ── Login check ───────────────────────────────────────────────────────
         public async Task<AppUser?> ValidateLogin(LoginDto dto)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == dto.Email && u.IsActive);
+            var user = await _userRepository.GetActiveByEmailAsync(dto.Email);
 
-            if (user == null) return null;
+            if (user == null)
+            {
+                return null;
+            }
 
-            // Verify hashed password
             bool valid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
-            return valid ? user : null;
+            if (valid)
+            {
+                return user;
+            }
+            return null;
         }
 
-        // ── Helper: convert entity to response DTO ────────────────────────────
-        private UserResponseDto MapToDto(AppUser u) => new UserResponseDto
+        private UserResponseDto MapToDto(AppUser u)
         {
-            UserId = u.UserId,
-            Name = u.Name,
-            Email = u.Email,
-            Role = u.Role.ToString(),
-            IsActive = u.IsActive,
-            CreatedAt = u.CreatedAt
-        };
+            var dto = new UserResponseDto
+            {
+                UserId = u.UserId,
+                Name = u.Name,
+                Email = u.Email,
+                Role = u.Role.ToString(),
+                IsActive = u.IsActive,
+                CreatedAt = u.CreatedAt
+            };
+            return dto;
+        }
     }
 }

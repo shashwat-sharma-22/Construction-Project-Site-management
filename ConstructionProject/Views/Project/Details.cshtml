@@ -19,7 +19,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Budget:</label>
-                            <p>$@Model.budget.ToString("N2")</p>
+                            <p>₹@Model.budget.ToString("N2")</p>
                         </div>
                     </div>
 
@@ -34,9 +34,21 @@
                         </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Assigned Contractor:</label>
+                            <p>@(Model.Contractor?.ContractorName ?? "Not Assigned")</p>
+                        </div>
+                    </div>
+
                     <div class="mt-4">
-                        <a href="@Url.Action("Edit", "Project", new { id = Model.ProjectId })" class="btn btn-warning me-2">Edit</a>
-                        <a href="@Url.Action("Index", "Project")" class="btn btn-secondary">Back</a>
+                        @if (ViewData["UserRole"]?.ToString() != "Contractor")
+                        {
+                            <a href="@Url.Action("Edit", "Project", new { id = Model.ProjectId })" class="btn btn-warning me-2">Edit</a>
+                        }
+                        <a href="@Url.Action("Index", "Task", new { projectId = Model.ProjectId })" class="btn btn-success me-2">View Tasks</a>
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-secondary me-2">Back to Projects</a>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">🏠 Dashboard</a>
                         <a href="@Url.Action("Delete", "Project", new { id = Model.ProjectId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                     </div>
                 </div>

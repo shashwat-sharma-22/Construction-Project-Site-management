@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Contractor Details";
+    var isAdmin = string.Equals(User.FindFirst("role")?.Value ?? Context.Request.Cookies["userRole"], "Admin", StringComparison.OrdinalIgnoreCase);
 }
 
 <div class="container mt-4">
@@ -46,9 +47,15 @@
                     }
 
                     <div class="mt-4">
-                        <a href="@Url.Action("Edit", "Contractor", new { id = Model.ContractorId })" class="btn btn-warning me-2">Edit</a>
-                        <a href="@Url.Action("Index", "Contractor")" class="btn btn-secondary">Back</a>
-                        <a href="@Url.Action("Delete", "Contractor", new { id = Model.ContractorId })" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        @if (isAdmin)
+                        {
+                            <a href="@Url.Action("Edit", "Contractor", new { id = Model.ContractorId })" class="btn btn-warning me-2">Edit</a>
+                            <form asp-action="Delete" asp-controller="Contractor" asp-route-id="@Model.ContractorId" method="post" style="display:inline;" class="me-2">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        }
+                        <a href="@Url.Action("Index", "Contractor")" class="btn btn-secondary me-2">Back to Contractors</a>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">🏠 Dashboard</a>
                     </div>
                 </div>
             </div>

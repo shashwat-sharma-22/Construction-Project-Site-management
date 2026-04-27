@@ -10,9 +10,28 @@
             <h1>📋 Projects</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="@Url.Action("Create", "Project")" class="btn btn-primary">
-                <i class="bi bi-plus"></i> New Project
+            @if (ViewData["UserRole"]?.ToString() != "Contractor")
+            {
+                <a href="@Url.Action("Create", "Project")" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> New Project
+                </a>
+                <a href="@Url.Action("AssignContractor", "Project")" class="btn btn-success">
+                    🔗 Assign Contractor
+                </a>
+            }
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                🏠 Dashboard
             </a>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <form method="get" asp-action="Index" asp-controller="Project" class="d-flex">
+                <input type="text" name="search" value="@ViewData["CurrentSearch"]" class="form-control me-2" placeholder="Search by Project ID or Name..." />
+                <button type="submit" class="btn btn-outline-primary me-2">Search</button>
+                <a href="@Url.Action("Index", "Project")" class="btn btn-outline-secondary">Clear</a>
+            </form>
         </div>
     </div>
 
@@ -26,6 +45,7 @@
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Budget</th>
+                        <th>Contractor</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -36,15 +56,20 @@
                             <td><strong>@project.ProjectName</strong></td>
                             <td>@project.startDate?.ToString("MMM dd, yyyy")</td>
                             <td>@project.endDate?.ToString("MMM dd, yyyy")</td>
-                            <td>$@project.budget.ToString("N2")</td>
+<td>$@project.budget.ToString("N2")</td>
+<td>@(project.Contractor?.ContractorName ?? "Not Assigned")</td>
                             <td>
+                                <a href="@Url.Action("Index", "Task", new { projectId = project.ProjectId })" class="btn btn-success btn-sm">Tasks</a>
                                 <a href="@Url.Action("Details", "Project", new { id = project.ProjectId })" class="btn btn-info btn-sm">View</a>
-                                <a href="@Url.Action("Edit", "Project", new { id = project.ProjectId })" class="btn btn-warning btn-sm">Edit</a>
-                                <form asp-action="Delete" asp-controller="Project" asp-route-id="@project.ProjectId" method="post" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?)">
-                                        Delete
-                                    </button>
-                                </form>
+                                @if (ViewData["UserRole"]?.ToString() != "Contractor")
+                                {
+                                    <a href="@Url.Action("Edit", "Project", new { id = project.ProjectId })" class="btn btn-warning btn-sm">Edit</a>
+                                    <form asp-action="Delete" asp-controller="Project" asp-route-id="@project.ProjectId" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?)">
+                                            Delete
+                                        </button>
+                                    </form>
+                                }
 
                             </td>
                         </tr>
@@ -55,10 +80,21 @@
     }
     else
     {
-        <div class="alert alert-info text-center py-5">
-            <h5>No projects found</h5>
-            <p>Get started by creating a new project.</p>
-            <a href="@Url.Action("Create", "Project")" class="btn btn-primary">Create Project</a>
-        </div>
+        @if (ViewData["UserRole"]?.ToString() == "Contractor")
+        {
+            <div class="alert alert-warning text-center py-5">
+                <h5>You have not been assigned to any projects</h5>
+                <p>Please contact your project manager for project assignments.</p>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">🏠 Back to Dashboard</a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center py-5">
+                <h5>No projects found</h5>
+                <p>Get started by creating a new project.</p>
+                <a href="@Url.Action("Create", "Project")" class="btn btn-primary">Create Project</a>
+            </div>
+        }
     }
 </div>

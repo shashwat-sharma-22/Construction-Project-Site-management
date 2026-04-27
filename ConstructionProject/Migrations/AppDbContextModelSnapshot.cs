@@ -64,7 +64,7 @@ namespace ConstructionProject.Migrations
                             Email = "admin@construction.com",
                             IsActive = true,
                             Name = "Super Admin",
-                            PasswordHash = "$2a$11$/iSU4yE5Jgs3hwacfeqPY.Qv2Ob72jpZld0J8x.SlH0RVJ1zfnMfO",
+                            PasswordHash = "$2a$11$8xz3z5AEMbTveglrUdSs0OniqHJNXI1to1pHVp4WEYXHRYQvd5SV6",
                             Role = 0
                         });
                 });
@@ -82,6 +82,9 @@ namespace ConstructionProject.Migrations
 
                     b.Property<string>("ContractorName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAssigned")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Specialization")
                         .HasColumnType("nvarchar(max)");
@@ -172,6 +175,9 @@ namespace ConstructionProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectId"));
 
+                    b.Property<int?>("ContractorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectName")
                         .HasColumnType("nvarchar(max)");
 
@@ -186,6 +192,8 @@ namespace ConstructionProject.Migrations
 
                     b.HasKey("ProjectId");
 
+                    b.HasIndex("ContractorId");
+
                     b.ToTable("Projects");
                 });
 
@@ -196,9 +204,6 @@ namespace ConstructionProject.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskId"));
-
-                    b.Property<string>("AssignedTo")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");
@@ -212,9 +217,14 @@ namespace ConstructionProject.Migrations
                     b.Property<string>("TaskName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("WorkerId")
+                        .HasColumnType("int");
+
                     b.HasKey("TaskId");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("WorkerId");
 
                     b.ToTable("Tasks");
                 });
@@ -282,6 +292,15 @@ namespace ConstructionProject.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("ConstructionProject.Models.Project", b =>
+                {
+                    b.HasOne("ConstructionProject.Models.Contractor", "Contractor")
+                        .WithMany()
+                        .HasForeignKey("ContractorId");
+
+                    b.Navigation("Contractor");
+                });
+
             modelBuilder.Entity("ConstructionProject.Models.ProjectTask", b =>
                 {
                     b.HasOne("ConstructionProject.Models.Project", "Project")
@@ -290,7 +309,13 @@ namespace ConstructionProject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ConstructionProject.Models.Workforce", "Worker")
+                        .WithMany()
+                        .HasForeignKey("WorkerId");
+
                     b.Navigation("Project");
+
+                    b.Navigation("Worker");
                 });
 
             modelBuilder.Entity("ConstructionProject.Models.SafetyInspection", b =>

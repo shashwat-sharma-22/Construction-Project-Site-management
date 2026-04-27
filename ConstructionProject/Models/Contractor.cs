@@ -9,6 +9,7 @@ namespace ConstructionProject.Models
         public string? ContractorName { get; set; }
         public string? Specialization { get; set; }
         public string? ContactInfo { get; set; }
+        public bool IsAssigned { get; set; } = false;
 
         public ICollection<Workforce>? Workforces { get; set; }
     }
