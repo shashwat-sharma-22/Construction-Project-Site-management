@@ -21,10 +21,11 @@ namespace ConstructionProject.Controllers
 
         [HttpGet("")]
         [HttpGet("index")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search)
         {
             var userRole = GetUserRole();
-            ViewBag.UserRole = userRole; 
+            ViewBag.UserRole = userRole;
+            ViewData["CurrentSearch"] = search;
 
             List<Project> projects;
 
@@ -36,11 +37,25 @@ namespace ConstructionProject.Controllers
                     return View(new List<Project>());
                 }
 
-                projects = (await _service.GetProjectsByContractorAsync(contractor.ContractorId)).ToList();
+                if (string.IsNullOrWhiteSpace(search))
+                {
+                    projects = (await _service.GetProjectsByContractorAsync(contractor.ContractorId)).ToList();
+                }
+                else
+                {
+                    projects = (await _service.SearchProjectsByContractorAsync(contractor.ContractorId, search.Trim())).ToList();
+                }
             }
             else
             {
-                projects = (await _service.GetAllProjectsAsync()).ToList();
+                if (string.IsNullOrWhiteSpace(search))
+                {
+                    projects = (await _service.GetAllProjectsAsync()).ToList();
+                }
+                else
+                {
+                    projects = (await _service.SearchProjectsAsync(search.Trim())).ToList();
+                }
             }
 
             return View(projects);
@@ -80,7 +95,16 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index");
             }
 
-            if (ModelState.IsValid)
+            if (project.ContractorId.HasValue)
+            {
+                var contractor = await _contractorService.GetContractorDetailsAsync(project.ContractorId.Value);
+                if (contractor != null && contractor.IsAssigned)
+                {
+                    ModelState.AddModelError("ContractorId", "This contractor is already assigned to another project.");
+                }
+            }
+
+            if (ModelState.IsValid) 
             {
                 var created = await _service.CreateProjectAsync(project);
                 return RedirectToAction("Details", new { id = created.ProjectId });
@@ -127,6 +151,16 @@ namespace ConstructionProject.Controllers
                 return BadRequest();
             }
 
+            if (project.ContractorId.HasValue)
+            {
+                var contractor = await _contractorService.GetContractorDetailsAsync(project.ContractorId.Value);
+                var existingProject = await _service.GetProjectDetailsAsync(id);
+                if (contractor != null && contractor.IsAssigned && existingProject?.ContractorId != project.ContractorId)
+                {
+                    ModelState.AddModelError("ContractorId", "This contractor is already assigned to another project.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 var ok = await _service.UpdateProjectPlanAsync(id, project);
@@ -145,7 +179,7 @@ namespace ConstructionProject.Controllers
         }
 
         [HttpGet("assign-contractor")]
-        public async Task<IActionResult> AssignContractor()
+        public async Task<IActionResult> AssignContractor(string? search)
         {
             var userRole = GetUserRole();
             if (userRole != "Admin" && userRole != "ProjectManager")
@@ -153,10 +187,20 @@ namespace ConstructionProject.Controllers
                 return RedirectToAction("Index");
             }
 
+            ViewData["CurrentSearch"] = search;
+
             var allContractors = (await _contractorService.GetAllContractorsAsync()).ToList();
             ViewBag.AllContractors = allContractors;
 
-            var projects = (await _service.GetAllProjectsAsync()).ToList();
+            List<Project> projects;
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                projects = (await _service.GetAllProjectsAsync()).ToList();
+            }
+            else
+            {
+                projects = (await _service.SearchProjectsAsync(search.Trim())).ToList();
+            }
 
             return View(projects);
         }

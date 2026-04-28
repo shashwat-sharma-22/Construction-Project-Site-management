@@ -19,7 +19,6 @@ namespace ConstructionProject.Models
         [MaxLength(255)]
         public string? Remarks { get; set; }
 
-        // Navigation property
         public Project? Project { get; set; }
     }
 }

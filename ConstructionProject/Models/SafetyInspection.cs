@@ -25,7 +25,6 @@ namespace ConstructionProject.Models
 
         public ComplianceStatus ComplianceStatus { get; set; }
 
-        // Navigation property
         public Project? Project { get; set; }
     }
 }

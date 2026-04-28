@@ -34,7 +34,7 @@ namespace ConstructionProject.Tests.Controllers
             _mockProjectService.Setup(s => s.GetAllProjectsAsync()) 
                 .ReturnsAsync(new List<Project> { new Project { ProjectId = 1, ProjectName = "P1" } });
 
-            var result = await _controller.Index() as ViewResult;
+            var result = await _controller.Index(null) as ViewResult;
 
             Assert.That(result, Is.Not.Null);
             Assert.That((result!.Model as List<Project>)!.Count, Is.EqualTo(1));

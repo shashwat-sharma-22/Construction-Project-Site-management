@@ -91,6 +91,26 @@ namespace ConstructionProject.Repositories
             {
                 project.ContractorId = null;
             }
+
+            var workerIds = await _db.Workforces
+                .Where(w => w.ContractorId == contractorId)
+                .Select(w => w.WorkerId)
+                .ToListAsync();
+
+            var tasks = await _db.Tasks
+                .Where(t => t.WorkerId != null && workerIds.Contains(t.WorkerId.Value))
+                .ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                task.WorkerId = null;
+            }
+
+            var workforces = await _db.Workforces
+                .Where(w => w.ContractorId == contractorId)
+                .ToListAsync();
+
+            _db.Workforces.RemoveRange(workforces);
         }
 
         public Task SaveChangesAsync()

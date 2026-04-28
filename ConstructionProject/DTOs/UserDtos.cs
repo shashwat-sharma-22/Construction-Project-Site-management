@@ -38,7 +38,6 @@ namespace ConstructionProject.DTOs
         public UserRole NewRole { get; set; }
     }
 
-    // What we send back — never expose PasswordHash
     public class UserResponseDto
     {
         public int UserId { get; set; }
@@ -49,7 +48,6 @@ namespace ConstructionProject.DTOs
         public DateTime CreatedAt { get; set; }
     }
 
-    // Response after successful login
     public class LoginResponseDto
     {
         public int UserId { get; set; }
