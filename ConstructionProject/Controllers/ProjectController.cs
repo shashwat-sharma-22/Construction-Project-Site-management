@@ -10,8 +10,8 @@ namespace ConstructionProject.Controllers
     [Route("[controller]")]
     public class ProjectController : Controller
     {
-        private readonly IProjectService _service;
-        private readonly IContractorService _contractorService;
+        private readonly IProjectService _service; 
+        private readonly IContractorService _contractorService; 
 
         public ProjectController(IProjectService service, IContractorService contractorService)
         {
@@ -24,7 +24,7 @@ namespace ConstructionProject.Controllers
         public async Task<IActionResult> Index()
         {
             var userRole = GetUserRole();
-            ViewData["UserRole"] = userRole;
+            ViewBag.UserRole = userRole; 
 
             List<Project> projects;
 
@@ -54,7 +54,6 @@ namespace ConstructionProject.Controllers
             {
                 return NotFound();
             }
-            ViewData["UserRole"] = GetUserRole();
             return View(project);
         }
 

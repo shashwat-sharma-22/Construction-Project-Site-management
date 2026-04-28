@@ -10,7 +10,7 @@
             <h1>📋 Projects</h1>
         </div>
         <div class="col-md-4 text-end">
-            @if (ViewData["UserRole"]?.ToString() != "Contractor")
+            @if (ViewBag.UserRole != "Contractor")
             {
                 <a href="@Url.Action("Create", "Project")" class="btn btn-primary">
                     <i class="bi bi-plus"></i> New Project
@@ -80,7 +80,7 @@
     }
     else
     {
-        @if (ViewData["UserRole"]?.ToString() == "Contractor")
+        @if (ViewBag.UserRole == "Contractor")
         {
             <div class="alert alert-warning text-center py-5">
                 <h5>You have not been assigned to any projects</h5>

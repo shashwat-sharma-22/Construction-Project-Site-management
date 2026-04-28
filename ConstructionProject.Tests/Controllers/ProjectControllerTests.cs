@@ -31,7 +31,7 @@ namespace ConstructionProject.Tests.Controllers
         [Test]
         public async Task Index_ReturnsAllProjects()
         {
-            _mockProjectService.Setup(s => s.GetAllProjectsAsync())
+            _mockProjectService.Setup(s => s.GetAllProjectsAsync()) 
                 .ReturnsAsync(new List<Project> { new Project { ProjectId = 1, ProjectName = "P1" } });
 
             var result = await _controller.Index() as ViewResult;

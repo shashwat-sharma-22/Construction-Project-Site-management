@@ -75,8 +75,8 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            context.Token = context.Request.Cookies["authToken"];
-            return Task.CompletedTask;
+            context.Token = context.Request.Cookies["authToken"]; 
+            return Task.CompletedTask; 
         }
     };
 });
@@ -113,10 +113,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    db.Database.Migrate(); 
 }
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment()) 
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
